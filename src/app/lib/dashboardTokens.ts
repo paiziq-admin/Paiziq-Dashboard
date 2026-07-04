@@ -1,0 +1,37 @@
+export const dashboardTokens = {
+  color: {
+    background: "#e8e8e8",
+    foreground: "#3a2f3c",
+    primary: "#564256",
+    primaryDark: "#3f303f",
+    accent: "#fc814a",
+    accentDark: "#d05a24",
+    accentHover: "#e86e38",
+    muted: "#96939b",
+    secondaryText: "#5c5462",
+    success: "#4a8a68",
+    successText: "#2e6b4f",
+    warning: "#d9973b",
+    warningText: "#8a5f12",
+    danger: "#c05b47",
+    dangerText: "#a63a28",
+    neutral: "#bfbfbf",
+    codeBg: "rgba(56,45,58,0.95)",
+    codeText: "#e8e0e8",
+  },
+  surface: {
+    glass: "rgba(255,255,255,0.55)",
+    glassStrong: "rgba(255,255,255,0.62)",
+    glassShell: "rgba(255,255,255,0.42)",
+    border: "rgba(255,255,255,0.70)",
+    rule: "rgba(86,66,86,0.07)",
+  },
+  radius: {
+    panel: 14,
+    control: 9,
+    small: 8,
+    nav: 10,
+    pill: 999,
+  },
+} as const;
+
