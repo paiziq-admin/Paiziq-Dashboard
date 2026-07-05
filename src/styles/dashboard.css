@@ -124,10 +124,15 @@
 
 .control {
   height: 34px;
-  padding: 0 12px;
+  padding-block: 0;
+  padding-inline: 12px;
   border-radius: var(--radius-control);
   font-size: 13px;
   font-weight: 600;
+}
+
+.control--leading-icon {
+  padding-inline-start: 34px;
 }
 
 .control-sm {

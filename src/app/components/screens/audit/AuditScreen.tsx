@@ -81,12 +81,14 @@ export function AuditScreen() {
                 <div className="mono mb-[16px] rounded-[9px] border border-[rgba(74,138,104,0.25)] bg-[rgba(74,138,104,0.10)] p-[9px_12px] text-[12px] text-[var(--success-text)]">{selected.newValue}</div>
               </>
             ) : null}
-            {selected.reason ? (
-              <>
-                <DrawerLabel>Reason</DrawerLabel>
-                <div className="mb-[16px] text-[13px]">{selected.reason}</div>
-              </>
-            ) : null}
+            <DrawerLabel>Reason</DrawerLabel>
+            <div className="mb-[16px] text-[13px]">
+              {selected.reason?.trim() ? (
+                selected.reason
+              ) : (
+                <span className="text-[var(--muted-foreground)]">— no reason recorded</span>
+              )}
+            </div>
             <DrawerLabel>Full Event Metadata</DrawerLabel>
             <CodeBlock value={JSON.stringify(selected, null, 2)} />
           </>

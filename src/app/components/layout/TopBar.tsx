@@ -26,9 +26,14 @@ export function TopBar() {
 
       <label className="relative flex max-w-[460px] flex-1 items-center">
         <span className="sr-only">Global search</span>
-        <Search className="absolute left-[11px] text-[var(--muted-foreground)]" size={15} strokeWidth={2} />
+        <Search
+          aria-hidden
+          className="pointer-events-none absolute left-[11px] top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]"
+          size={15}
+          strokeWidth={2}
+        />
         <input
-          className="control w-full pl-[34px] font-normal text-[var(--foreground)]"
+          className="control control--leading-icon w-full font-normal text-[var(--foreground)]"
           placeholder="Search payments, users, agents..."
           type="search"
         />

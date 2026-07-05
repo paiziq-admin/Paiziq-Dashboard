@@ -13,7 +13,7 @@ export function Sidebar({ onNavigate }: SidebarProps) {
 
   return (
     <nav className="flex h-full flex-col border-r glass-shell">
-      <div className="border-b border-[rgba(86,66,86,0.10)] p-[20px_20px_16px]">
+      <div className="flex h-[56px] shrink-0 items-center border-b border-[rgba(86,66,86,0.10)] px-[20px]">
         <div className="flex items-center gap-[10px]">
           <div className="flex h-[34px] w-[34px] items-center justify-center rounded-[10px] bg-gradient-to-br from-[var(--accent)] to-[var(--accent-dark)] text-white shadow-[0_4px_12px_rgba(252,129,74,0.4)]">
             <ShieldCheck size={18} strokeWidth={2.2} />
