@@ -19,9 +19,14 @@ import {
   Grid,
   Drawer,
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import { mockPayments } from "../data/mockData";
+import { appColors, statusColors } from "../themeTokens";
 
 export function PaymentFeed() {
+  const theme = useTheme();
+  const colors = appColors(theme);
+  const statuses = statusColors(theme);
   const [selectedPayment, setSelectedPayment] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState("all");
 
@@ -33,17 +38,17 @@ export function PaymentFeed() {
 
   const getDecisionColor = (decision: string) => {
     switch (decision) {
-      case "approved": return { bg: "#dcfce7", color: "#166534" };
-      case "blocked": return { bg: "#fee2e2", color: "#991b1b" };
-      case "review_required": return { bg: "#fef3c7", color: "#92400e" };
-      default: return { bg: "#e0e7ff", color: "#3730a3" };
+      case "approved": return { bgcolor: statuses.approved.bg, color: statuses.approved.color };
+      case "blocked": return { bgcolor: statuses.blocked.bg, color: statuses.blocked.color };
+      case "review_required": return { bgcolor: statuses.warning.bg, color: statuses.warning.color };
+      default: return { bgcolor: statuses.info.bg, color: statuses.info.color };
     }
   };
 
   const getRiskScoreColor = (score: number) => {
-    if (score < 40) return { bg: "#dcfce7", color: "#166534" };
-    if (score < 70) return { bg: "#fef3c7", color: "#92400e" };
-    return { bg: "#fee2e2", color: "#991b1b" };
+    if (score < 40) return { bgcolor: statuses.approved.bg, color: statuses.approved.color };
+    if (score < 70) return { bgcolor: statuses.warning.bg, color: statuses.warning.color };
+    return { bgcolor: statuses.error.bg, color: statuses.error.color };
   };
 
   return (
@@ -83,15 +88,15 @@ export function PaymentFeed() {
           <Table stickyHeader size="small">
             <TableHead>
               <TableRow>
-                <TableCell sx={{ fontWeight: 600, bgcolor: "#f8f9fa" }}>Payment ID</TableCell>
-                <TableCell sx={{ fontWeight: 600, bgcolor: "#f8f9fa" }}>Timestamp</TableCell>
-                <TableCell sx={{ fontWeight: 600, bgcolor: "#f8f9fa" }}>Agent</TableCell>
-                <TableCell sx={{ fontWeight: 600, bgcolor: "#f8f9fa" }}>User</TableCell>
-                <TableCell sx={{ fontWeight: 600, bgcolor: "#f8f9fa" }}>Amount</TableCell>
-                <TableCell sx={{ fontWeight: 600, bgcolor: "#f8f9fa" }}>Recipient</TableCell>
-                <TableCell sx={{ fontWeight: 600, bgcolor: "#f8f9fa" }}>Risk Score</TableCell>
-                <TableCell sx={{ fontWeight: 600, bgcolor: "#f8f9fa" }}>Decision</TableCell>
-                <TableCell sx={{ fontWeight: 600, bgcolor: "#f8f9fa" }}>Signals</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Payment ID</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Timestamp</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Agent</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>User</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Amount</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Recipient</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Risk Score</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Decision</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Signals</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -105,12 +110,12 @@ export function PaymentFeed() {
                     hover
                     sx={{
                       cursor: "pointer",
-                      bgcolor: selectedPayment === payment.id ? "#f0f9ff" : "inherit",
+                      bgcolor: selectedPayment === payment.id ? colors.surfaceSelected : "inherit",
                     }}
                     onClick={() => setSelectedPayment(payment.id)}
                   >
                     <TableCell sx={{ fontFamily: "monospace", fontSize: 13 }}>
-                      <Link to={`/payments/${payment.id}`} style={{ color: "#2563eb", textDecoration: "none" }}>
+                      <Link to={`/payments/${payment.id}`} style={{ color: colors.link, textDecoration: "none" }}>
                         {payment.id}
                       </Link>
                     </TableCell>
@@ -127,17 +132,17 @@ export function PaymentFeed() {
                       <Chip
                         label={payment.riskScore}
                         size="small"
-                        sx={{ bgcolor: riskStyle.bg, color: riskStyle.color, fontWeight: 600, minWidth: 45 }}
+                        sx={{ ...riskStyle, fontWeight: 600, minWidth: 45 }}
                       />
                     </TableCell>
                     <TableCell>
                       <Chip
                         label={payment.decision.replace("_", " ")}
                         size="small"
-                        sx={{ bgcolor: decisionStyle.bg, color: decisionStyle.color }}
+                        sx={decisionStyle}
                       />
                     </TableCell>
-                    <TableCell sx={{ fontSize: 12, color: "#64748b", maxWidth: 200 }}>
+                    <TableCell sx={{ fontSize: 12, color: "text.secondary", maxWidth: 200 }}>
                       {payment.triggeredSignals.slice(0, 2).join(", ")}
                       {payment.triggeredSignals.length > 2 && ` +${payment.triggeredSignals.length - 2}`}
                     </TableCell>
@@ -162,15 +167,15 @@ export function PaymentFeed() {
             <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>Payment Preview</Typography>
 
             <Box sx={{ mb: 3 }}>
-              <Typography variant="caption" sx={{ color: "#64748b" }}>Payment ID</Typography>
+              <Typography variant="caption" sx={{ color: "text.secondary" }}>Payment ID</Typography>
               <Typography variant="body2" sx={{ fontFamily: "monospace", mb: 1.5 }}>{selectedPaymentData.id}</Typography>
 
-              <Typography variant="caption" sx={{ color: "#64748b" }}>Amount</Typography>
+              <Typography variant="caption" sx={{ color: "text.secondary" }}>Amount</Typography>
               <Typography variant="h6" sx={{ mb: 1.5 }}>
                 {selectedPaymentData.amount.toLocaleString()} {selectedPaymentData.currency}
               </Typography>
 
-              <Typography variant="caption" sx={{ color: "#64748b" }}>Risk Score</Typography>
+              <Typography variant="caption" sx={{ color: "text.secondary" }}>Risk Score</Typography>
               <Box sx={{ mb: 1.5 }}>
                 <Chip
                   label={selectedPaymentData.riskScore}
@@ -183,7 +188,7 @@ export function PaymentFeed() {
                 />
               </Box>
 
-              <Typography variant="caption" sx={{ color: "#64748b" }}>Decision</Typography>
+              <Typography variant="caption" sx={{ color: "text.secondary" }}>Decision</Typography>
               <Box sx={{ mb: 1.5 }}>
                 <Chip
                   label={selectedPaymentData.decision.replace("_", " ")}
@@ -191,7 +196,7 @@ export function PaymentFeed() {
                 />
               </Box>
 
-              <Typography variant="caption" sx={{ color: "#64748b" }}>Triggered Signals</Typography>
+              <Typography variant="caption" sx={{ color: "text.secondary" }}>Triggered Signals</Typography>
               <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mt: 0.5 }}>
                 {selectedPaymentData.triggeredSignals.map((signal) => (
                   <Chip key={signal} label={signal} size="small" />

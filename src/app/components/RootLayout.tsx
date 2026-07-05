@@ -26,8 +26,12 @@ import {
   Activity,
   FileText,
   Bell,
+  Moon,
   Search,
+  Sun,
 } from "lucide-react";
+import { useAppTheme } from "../theme";
+import { appColors } from "../themeTokens";
 
 const drawerWidth = 240;
 
@@ -42,9 +46,10 @@ const navItems = [
 
 export function RootLayout() {
   const location = useLocation();
+  const { mode, toggleMode } = useAppTheme();
 
   return (
-    <Box sx={{ display: "flex", height: "100vh", bgcolor: "#f8f9fa" }}>
+    <Box sx={{ display: "flex", height: "100vh", bgcolor: "background.default" }}>
       {/* Sidebar */}
       <Drawer
         variant="permanent"
@@ -54,16 +59,16 @@ export function RootLayout() {
           "& .MuiDrawer-paper": {
             width: drawerWidth,
             boxSizing: "border-box",
-            borderRight: "1px solid #e5e7eb",
-            bgcolor: "#ffffff",
+            borderRight: (theme) => `1px solid ${theme.palette.divider}`,
+            bgcolor: "background.paper",
           },
         }}
       >
-        <Box sx={{ p: 2.5, borderBottom: "1px solid #e5e7eb" }}>
-          <Typography variant="h6" sx={{ fontWeight: 600, color: "#0f172a" }}>
+        <Box sx={{ p: 2.5, borderBottom: (theme) => `1px solid ${theme.palette.divider}` }}>
+          <Typography variant="h6" sx={{ fontWeight: 600, color: "text.primary" }}>
             Payment Agent
           </Typography>
-          <Typography variant="caption" sx={{ color: "#64748b" }}>
+          <Typography variant="caption" sx={{ color: "text.secondary" }}>
             Audit Layer
           </Typography>
         </Box>
@@ -78,15 +83,15 @@ export function RootLayout() {
                   to={item.path}
                   sx={{
                     borderRadius: 1,
-                    "&:hover": { bgcolor: "#f1f5f9" },
+                    "&:hover": { bgcolor: (theme) => appColors(theme).surfaceHover },
                     ...(isActive && {
-                      bgcolor: "#eff6ff",
-                      color: "#2563eb",
-                      "&:hover": { bgcolor: "#dbeafe" },
+                      bgcolor: (theme) => appColors(theme).surfaceSelected,
+                      color: "primary.main",
+                      "&:hover": { bgcolor: (theme) => appColors(theme).surfaceSelected },
                     }),
                   }}
                 >
-                  <ListItemIcon sx={{ minWidth: 40, color: isActive ? "#2563eb" : "#64748b" }}>
+                  <ListItemIcon sx={{ minWidth: 40, color: isActive ? "primary.main" : "text.secondary" }}>
                     <Icon size={20} />
                   </ListItemIcon>
                   <ListItemText
@@ -110,9 +115,9 @@ export function RootLayout() {
           position="static"
           elevation={0}
           sx={{
-            bgcolor: "#ffffff",
-            borderBottom: "1px solid #e5e7eb",
-            color: "#0f172a",
+            bgcolor: "background.paper",
+            borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
+            color: "text.primary",
           }}
         >
           <Toolbar sx={{ gap: 2 }}>
@@ -121,7 +126,7 @@ export function RootLayout() {
               size="small"
               sx={{
                 minWidth: 140,
-                "& .MuiOutlinedInput-notchedOutline": { borderColor: "#e5e7eb" },
+                "& .MuiOutlinedInput-notchedOutline": { borderColor: "divider" },
               }}
             >
               <MenuItem value="production">Production</MenuItem>
@@ -136,14 +141,14 @@ export function RootLayout() {
                 flexGrow: 1,
                 maxWidth: 500,
                 "& .MuiOutlinedInput-root": {
-                  bgcolor: "#f8f9fa",
+                  bgcolor: (theme) => appColors(theme).surfaceAlt,
                   "& fieldset": { border: "none" },
                 },
               }}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Search size={18} color="#64748b" />
+                    <Search size={18} />
                   </InputAdornment>
                 ),
               }}
@@ -151,13 +156,22 @@ export function RootLayout() {
 
             <Box sx={{ flexGrow: 1 }} />
 
-            <IconButton>
+            <IconButton
+              onClick={toggleMode}
+              aria-label={`Switch to ${mode === "dark" ? "light" : "dark"} mode`}
+              title={`Switch to ${mode === "dark" ? "light" : "dark"} mode`}
+              sx={{ width: 40, height: 40 }}
+            >
+              {mode === "dark" ? <Sun size={20} /> : <Moon size={20} />}
+            </IconButton>
+
+            <IconButton sx={{ width: 40, height: 40 }}>
               <Badge badgeContent={3} color="error">
                 <Bell size={20} />
               </Badge>
             </IconButton>
 
-            <Avatar sx={{ width: 32, height: 32, bgcolor: "#3b82f6", fontSize: 14 }}>SC</Avatar>
+            <Avatar sx={{ width: 32, height: 32, bgcolor: "primary.main", fontSize: 14 }}>SC</Avatar>
           </Toolbar>
         </AppBar>
 
@@ -167,7 +181,7 @@ export function RootLayout() {
           sx={{
             flexGrow: 1,
             overflow: "auto",
-            bgcolor: "#f8f9fa",
+            bgcolor: "background.default",
           }}
         >
           <Outlet />

@@ -1,7 +1,9 @@
 import { Box, Paper, Typography, Grid, Chip, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import { TrendingUp, TrendingDown, AlertCircle, CheckCircle } from "lucide-react";
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { mockPayments } from "../data/mockData";
+import { appColors, statusColors } from "../themeTokens";
 
 const metricCards = [
   { label: "Total Payment Attempts", value: "2,847", change: "+12.3%", trend: "up" },
@@ -21,12 +23,6 @@ const volumeData = [
   { time: "20:00", volume: 290 },
 ];
 
-const decisionData = [
-  { name: "Approved", value: 2234, color: "#10b981" },
-  { name: "Blocked", value: 156, color: "#ef4444" },
-  { name: "Review Required", value: 457, color: "#f59e0b" },
-];
-
 const riskDistributionData = [
   { range: "0-20", count: 1580 },
   { range: "21-40", count: 720 },
@@ -36,7 +32,20 @@ const riskDistributionData = [
 ];
 
 export function OverviewDashboard() {
+  const theme = useTheme();
+  const colors = appColors(theme);
+  const statuses = statusColors(theme);
   const highRiskPayments = mockPayments.filter(p => p.riskScore >= 60).slice(0, 5);
+  const decisionData = [
+    { name: "Approved", value: 2234, color: statuses.approved.icon },
+    { name: "Blocked", value: 156, color: statuses.blocked.icon },
+    { name: "Review Required", value: 457, color: statuses.warning.icon },
+  ];
+  const tooltipStyle = {
+    backgroundColor: colors.chartTooltipBg,
+    borderColor: colors.chartTooltipBorder,
+    color: theme.palette.text.primary,
+  };
 
   return (
     <Box sx={{ p: 3 }}>
@@ -47,7 +56,7 @@ export function OverviewDashboard() {
         {metricCards.map((metric) => (
           <Grid item xs={12} sm={6} md={4} lg={2} key={metric.label}>
             <Paper sx={{ p: 2, height: "100%" }}>
-              <Typography variant="caption" sx={{ color: "#64748b", display: "block", mb: 0.5 }}>
+              <Typography variant="caption" sx={{ color: "text.secondary", display: "block", mb: 0.5 }}>
                 {metric.label}
               </Typography>
               <Typography variant="h5" sx={{ fontWeight: 600, mb: 0.5 }}>
@@ -55,13 +64,13 @@ export function OverviewDashboard() {
               </Typography>
               <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                 {metric.trend === "up" ? (
-                  <TrendingUp size={14} color={metric.label.includes("Blocked") || metric.label.includes("Review") ? "#ef4444" : "#10b981"} />
+                  <TrendingUp size={14} color={metric.label.includes("Blocked") || metric.label.includes("Review") ? statuses.error.icon : statuses.healthy.icon} />
                 ) : (
-                  <TrendingDown size={14} color={metric.label.includes("Risk") ? "#10b981" : "#ef4444"} />
+                  <TrendingDown size={14} color={metric.label.includes("Risk") ? statuses.healthy.icon : statuses.error.icon} />
                 )}
                 <Typography
                   variant="caption"
-                  sx={{ color: metric.trend === "up" && !metric.label.includes("Blocked") ? "#10b981" : "#64748b" }}
+                  sx={{ color: metric.trend === "up" && !metric.label.includes("Blocked") ? statuses.healthy.icon : "text.secondary" }}
                 >
                   {metric.change}
                 </Typography>
@@ -78,11 +87,11 @@ export function OverviewDashboard() {
             <Typography variant="h6" sx={{ mb: 2, fontWeight: 500 }}>Payment Volume Over Time (24h)</Typography>
             <ResponsiveContainer width="100%" height={250}>
               <LineChart data={volumeData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis dataKey="time" stroke="#64748b" fontSize={12} />
-                <YAxis stroke="#64748b" fontSize={12} />
-                <Tooltip />
-                <Line type="monotone" dataKey="volume" stroke="#3b82f6" strokeWidth={2} />
+                <CartesianGrid strokeDasharray="3 3" stroke={colors.chartGrid} />
+                <XAxis dataKey="time" stroke={colors.chartAxis} fontSize={12} />
+                <YAxis stroke={colors.chartAxis} fontSize={12} />
+                <Tooltip contentStyle={tooltipStyle} labelStyle={{ color: theme.palette.text.primary }} />
+                <Line type="monotone" dataKey="volume" stroke={theme.palette.primary.main} strokeWidth={2} />
               </LineChart>
             </ResponsiveContainer>
           </Paper>
@@ -98,7 +107,8 @@ export function OverviewDashboard() {
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
-                <Tooltip />
+                <Tooltip contentStyle={tooltipStyle} labelStyle={{ color: theme.palette.text.primary }} />
+                <Legend />
               </PieChart>
             </ResponsiveContainer>
           </Paper>
@@ -109,11 +119,11 @@ export function OverviewDashboard() {
             <Typography variant="h6" sx={{ mb: 2, fontWeight: 500 }}>Risk Score Distribution</Typography>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={riskDistributionData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis dataKey="range" stroke="#64748b" fontSize={12} />
-                <YAxis stroke="#64748b" fontSize={12} />
-                <Tooltip />
-                <Bar dataKey="count" fill="#3b82f6" />
+                <CartesianGrid strokeDasharray="3 3" stroke={colors.chartGrid} />
+                <XAxis dataKey="range" stroke={colors.chartAxis} fontSize={12} />
+                <YAxis stroke={colors.chartAxis} fontSize={12} />
+                <Tooltip contentStyle={tooltipStyle} labelStyle={{ color: theme.palette.text.primary }} />
+                <Bar dataKey="count" fill={theme.palette.primary.main} />
               </BarChart>
             </ResponsiveContainer>
           </Paper>
@@ -146,8 +156,8 @@ export function OverviewDashboard() {
                           label={payment.riskScore}
                           size="small"
                           sx={{
-                            bgcolor: payment.riskScore >= 70 ? "#fee2e2" : "#fef3c7",
-                            color: payment.riskScore >= 70 ? "#991b1b" : "#92400e",
+                            color: payment.riskScore >= 70 ? statuses.error.color : statuses.warning.color,
+                            backgroundColor: payment.riskScore >= 70 ? statuses.error.bg : statuses.warning.bg,
                             fontWeight: 600,
                           }}
                         />
@@ -157,12 +167,12 @@ export function OverviewDashboard() {
                           label={payment.decision === 'blocked' ? 'Blocked' : 'Review Required'}
                           size="small"
                           sx={{
-                            bgcolor: payment.decision === 'blocked' ? "#fee2e2" : "#fef3c7",
-                            color: payment.decision === 'blocked' ? "#991b1b" : "#92400e",
+                            color: payment.decision === 'blocked' ? statuses.blocked.color : statuses.warning.color,
+                            backgroundColor: payment.decision === 'blocked' ? statuses.blocked.bg : statuses.warning.bg,
                           }}
                         />
                       </TableCell>
-                      <TableCell sx={{ fontSize: 12, color: "#64748b" }}>
+                      <TableCell sx={{ fontSize: 12, color: "text.secondary" }}>
                         {payment.triggeredSignals.slice(0, 2).join(", ")}
                       </TableCell>
                     </TableRow>
@@ -177,11 +187,11 @@ export function OverviewDashboard() {
           <Paper sx={{ p: 2.5, mb: 2 }}>
             <Typography variant="h6" sx={{ mb: 2, fontWeight: 500 }}>System Health</Typography>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.5 }}>
-              <CheckCircle size={18} color="#10b981" />
+              <CheckCircle size={18} color={statuses.healthy.icon} />
               <Typography variant="body2">SDK Ingestion: Healthy</Typography>
             </Box>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <CheckCircle size={18} color="#10b981" />
+              <CheckCircle size={18} color={statuses.healthy.icon} />
               <Typography variant="body2">Webhook Delivery: 99.7%</Typography>
             </Box>
           </Paper>
@@ -191,15 +201,15 @@ export function OverviewDashboard() {
             <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
               <Box>
                 <Typography variant="body2" sx={{ fontWeight: 500 }}>checkout-service-prod</Typography>
-                <Typography variant="caption" sx={{ color: "#64748b" }}>42 flagged transactions</Typography>
+                <Typography variant="caption" sx={{ color: "text.secondary" }}>42 flagged transactions</Typography>
               </Box>
               <Box>
                 <Typography variant="body2" sx={{ fontWeight: 500 }}>mobile-app-v3</Typography>
-                <Typography variant="caption" sx={{ color: "#64748b" }}>28 flagged transactions</Typography>
+                <Typography variant="caption" sx={{ color: "text.secondary" }}>28 flagged transactions</Typography>
               </Box>
               <Box>
                 <Typography variant="body2" sx={{ fontWeight: 500 }}>web-checkout-v2</Typography>
-                <Typography variant="caption" sx={{ color: "#64748b" }}>15 flagged transactions</Typography>
+                <Typography variant="caption" sx={{ color: "text.secondary" }}>15 flagged transactions</Typography>
               </Box>
             </Box>
           </Paper>

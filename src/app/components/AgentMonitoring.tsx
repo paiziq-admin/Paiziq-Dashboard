@@ -15,25 +15,30 @@ import {
   TextField,
   InputAdornment,
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import { CheckCircle, AlertTriangle, XCircle, Copy, Eye, EyeOff } from "lucide-react";
 import { agents } from "../data/mockData";
+import { statusColors } from "../themeTokens";
 
 export function AgentMonitoring() {
+  const theme = useTheme();
+  const statuses = statusColors(theme);
+
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case "healthy": return <CheckCircle size={18} color="#10b981" />;
-      case "warning": return <AlertTriangle size={18} color="#f59e0b" />;
-      case "error": return <XCircle size={18} color="#ef4444" />;
+      case "healthy": return <CheckCircle size={18} color={statuses.healthy.icon} />;
+      case "warning": return <AlertTriangle size={18} color={statuses.warning.icon} />;
+      case "error": return <XCircle size={18} color={statuses.error.icon} />;
       default: return null;
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "healthy": return { bg: "#dcfce7", color: "#166534" };
-      case "warning": return { bg: "#fef3c7", color: "#92400e" };
-      case "error": return { bg: "#fee2e2", color: "#991b1b" };
-      default: return { bg: "#e5e7eb", color: "#374151" };
+      case "healthy": return { bgcolor: statuses.healthy.bg, color: statuses.healthy.color };
+      case "warning": return { bgcolor: statuses.warning.bg, color: statuses.warning.color };
+      case "error": return { bgcolor: statuses.error.bg, color: statuses.error.color };
+      default: return { bgcolor: statuses.neutral.bg, color: statuses.neutral.color };
     }
   };
 
@@ -45,7 +50,7 @@ export function AgentMonitoring() {
       <Grid container spacing={3} sx={{ mb: 3 }}>
         <Grid item xs={12} md={3}>
           <Paper sx={{ p: 2.5 }}>
-            <Typography variant="caption" sx={{ color: "#64748b", display: "block", mb: 0.5 }}>
+            <Typography variant="caption" sx={{ color: "text.secondary", display: "block", mb: 0.5 }}>
               Total Agents
             </Typography>
             <Typography variant="h4" sx={{ fontWeight: 600 }}>12</Typography>
@@ -53,18 +58,18 @@ export function AgentMonitoring() {
         </Grid>
         <Grid item xs={12} md={3}>
           <Paper sx={{ p: 2.5 }}>
-            <Typography variant="caption" sx={{ color: "#64748b", display: "block", mb: 0.5 }}>
+            <Typography variant="caption" sx={{ color: "text.secondary", display: "block", mb: 0.5 }}>
               Healthy Agents
             </Typography>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <CheckCircle size={20} color="#10b981" />
+              <CheckCircle size={20} color={statuses.healthy.icon} />
               <Typography variant="h4" sx={{ fontWeight: 600 }}>9</Typography>
             </Box>
           </Paper>
         </Grid>
         <Grid item xs={12} md={3}>
           <Paper sx={{ p: 2.5 }}>
-            <Typography variant="caption" sx={{ color: "#64748b", display: "block", mb: 0.5 }}>
+            <Typography variant="caption" sx={{ color: "text.secondary", display: "block", mb: 0.5 }}>
               Avg Decision Latency
             </Typography>
             <Typography variant="h4" sx={{ fontWeight: 600 }}>152ms</Typography>
@@ -72,31 +77,31 @@ export function AgentMonitoring() {
         </Grid>
         <Grid item xs={12} md={3}>
           <Paper sx={{ p: 2.5 }}>
-            <Typography variant="caption" sx={{ color: "#64748b", display: "block", mb: 0.5 }}>
+            <Typography variant="caption" sx={{ color: "text.secondary", display: "block", mb: 0.5 }}>
               Webhook Success Rate
             </Typography>
-            <Typography variant="h4" sx={{ fontWeight: 600, color: "#10b981" }}>99.4%</Typography>
+            <Typography variant="h4" sx={{ fontWeight: 600, color: statuses.healthy.icon }}>99.4%</Typography>
           </Paper>
         </Grid>
       </Grid>
 
       {/* Agents Table */}
       <Paper sx={{ mb: 3 }}>
-        <Box sx={{ p: 2.5, borderBottom: "1px solid #e5e7eb" }}>
+        <Box sx={{ p: 2.5, borderBottom: (theme) => `1px solid ${theme.palette.divider}` }}>
           <Typography variant="h6" sx={{ fontWeight: 600 }}>Registered Agents</Typography>
         </Box>
         <TableContainer>
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell sx={{ fontWeight: 600, bgcolor: "#f8f9fa" }}>Agent Name</TableCell>
-                <TableCell sx={{ fontWeight: 600, bgcolor: "#f8f9fa" }}>Environment</TableCell>
-                <TableCell sx={{ fontWeight: 600, bgcolor: "#f8f9fa" }}>SDK Version</TableCell>
-                <TableCell sx={{ fontWeight: 600, bgcolor: "#f8f9fa" }}>Last Event</TableCell>
-                <TableCell sx={{ fontWeight: 600, bgcolor: "#f8f9fa" }}>Error Rate</TableCell>
-                <TableCell sx={{ fontWeight: 600, bgcolor: "#f8f9fa" }}>Decision Latency</TableCell>
-                <TableCell sx={{ fontWeight: 600, bgcolor: "#f8f9fa" }}>Webhook Success</TableCell>
-                <TableCell sx={{ fontWeight: 600, bgcolor: "#f8f9fa" }}>Status</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Agent Name</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Environment</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>SDK Version</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Last Event</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Error Rate</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Decision Latency</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Webhook Success</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -110,8 +115,8 @@ export function AgentMonitoring() {
                         label={agent.environment}
                         size="small"
                         sx={{
-                          bgcolor: agent.environment === "production" ? "#eff6ff" : "#f3f4f6",
-                          color: agent.environment === "production" ? "#1e40af" : "#374151",
+                          bgcolor: agent.environment === "production" ? statuses.info.bg : statuses.neutral.bg,
+                          color: agent.environment === "production" ? statuses.info.color : statuses.neutral.color,
                         }}
                       />
                     </TableCell>
@@ -160,7 +165,7 @@ export function AgentMonitoring() {
                     <TableCell>
                       <Chip label="Timeout" size="small" color="error" />
                     </TableCell>
-                    <TableCell sx={{ fontSize: 12, color: "#64748b" }}>
+                    <TableCell sx={{ fontSize: 12, color: "text.secondary" }}>
                       Decision endpoint timeout after 5000ms
                     </TableCell>
                   </TableRow>
@@ -168,9 +173,9 @@ export function AgentMonitoring() {
                     <TableCell sx={{ fontSize: 13 }}>2026-05-30 12:18:45</TableCell>
                     <TableCell sx={{ fontFamily: "monospace", fontSize: 13 }}>mobile-app-v3</TableCell>
                     <TableCell>
-                      <Chip label="Validation" size="small" sx={{ bgcolor: "#fef3c7", color: "#92400e" }} />
+                      <Chip label="Validation" size="small" sx={{ bgcolor: statuses.warning.bg, color: statuses.warning.color }} />
                     </TableCell>
-                    <TableCell sx={{ fontSize: 12, color: "#64748b" }}>
+                    <TableCell sx={{ fontSize: 12, color: "text.secondary" }}>
                       Invalid currency code: XYZ
                     </TableCell>
                   </TableRow>
@@ -180,7 +185,7 @@ export function AgentMonitoring() {
                     <TableCell>
                       <Chip label="Auth" size="small" color="error" />
                     </TableCell>
-                    <TableCell sx={{ fontSize: 12, color: "#64748b" }}>
+                    <TableCell sx={{ fontSize: 12, color: "text.secondary" }}>
                       Invalid API key format
                     </TableCell>
                   </TableRow>
@@ -193,7 +198,7 @@ export function AgentMonitoring() {
         <Grid item xs={12} md={4}>
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>API Key Management</Typography>
-            <Typography variant="caption" sx={{ color: "#64748b", display: "block", mb: 2 }}>
+            <Typography variant="caption" sx={{ color: "text.secondary", display: "block", mb: 2 }}>
               Create and manage API keys for agent authentication
             </Typography>
 
@@ -201,7 +206,7 @@ export function AgentMonitoring() {
               Create New API Key
             </Button>
 
-            <Typography variant="caption" sx={{ color: "#64748b", display: "block", mb: 1 }}>
+            <Typography variant="caption" sx={{ color: "text.secondary", display: "block", mb: 1 }}>
               Active Keys
             </Typography>
 
@@ -227,7 +232,7 @@ export function AgentMonitoring() {
                     sx: { fontFamily: "monospace", fontSize: 12 },
                   }}
                 />
-                <Typography variant="caption" sx={{ color: "#64748b", display: "block", mt: 0.5 }}>
+                <Typography variant="caption" sx={{ color: "text.secondary", display: "block", mt: 0.5 }}>
                   Created: 2026-05-10
                 </Typography>
               </Paper>
@@ -253,7 +258,7 @@ export function AgentMonitoring() {
                     sx: { fontFamily: "monospace", fontSize: 12 },
                   }}
                 />
-                <Typography variant="caption" sx={{ color: "#64748b", display: "block", mt: 0.5 }}>
+                <Typography variant="caption" sx={{ color: "text.secondary", display: "block", mt: 0.5 }}>
                   Created: 2026-04-28
                 </Typography>
               </Paper>

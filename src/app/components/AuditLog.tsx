@@ -19,18 +19,23 @@ import {
   Drawer,
   Divider,
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import { auditLogEntries } from "../data/mockData";
+import { appColors, statusColors } from "../themeTokens";
 
 export function AuditLog() {
+  const theme = useTheme();
+  const colors = appColors(theme);
+  const statuses = statusColors(theme);
   const [selectedEntry, setSelectedEntry] = useState<string | null>(null);
 
   const selectedAuditEntry = auditLogEntries.find((_, i) => i.toString() === selectedEntry) || auditLogEntries[0];
 
   const getActionColor = (action: string) => {
-    if (action.includes("Approved")) return { bg: "#dcfce7", color: "#166534" };
-    if (action.includes("Rejected") || action.includes("Blocked")) return { bg: "#fee2e2", color: "#991b1b" };
-    if (action.includes("Updated") || action.includes("Created")) return { bg: "#e0e7ff", color: "#3730a3" };
-    return { bg: "#f3f4f6", color: "#374151" };
+    if (action.includes("Approved")) return { bgcolor: statuses.approved.bg, color: statuses.approved.color };
+    if (action.includes("Rejected") || action.includes("Blocked")) return { bgcolor: statuses.blocked.bg, color: statuses.blocked.color };
+    if (action.includes("Updated") || action.includes("Created")) return { bgcolor: statuses.info.bg, color: statuses.info.color };
+    return { bgcolor: statuses.neutral.bg, color: statuses.neutral.color };
   };
 
   return (
@@ -70,13 +75,13 @@ export function AuditLog() {
           <Table stickyHeader size="small">
             <TableHead>
               <TableRow>
-                <TableCell sx={{ fontWeight: 600, bgcolor: "#f8f9fa" }}>Timestamp</TableCell>
-                <TableCell sx={{ fontWeight: 600, bgcolor: "#f8f9fa" }}>Actor</TableCell>
-                <TableCell sx={{ fontWeight: 600, bgcolor: "#f8f9fa" }}>Action</TableCell>
-                <TableCell sx={{ fontWeight: 600, bgcolor: "#f8f9fa" }}>Entity</TableCell>
-                <TableCell sx={{ fontWeight: 600, bgcolor: "#f8f9fa" }}>Change</TableCell>
-                <TableCell sx={{ fontWeight: 600, bgcolor: "#f8f9fa" }}>IP Address</TableCell>
-                <TableCell sx={{ fontWeight: 600, bgcolor: "#f8f9fa" }}>Reason</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Timestamp</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Actor</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Action</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Entity</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Change</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>IP Address</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Reason</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -88,7 +93,7 @@ export function AuditLog() {
                     hover
                     sx={{
                       cursor: "pointer",
-                      bgcolor: selectedEntry === index.toString() ? "#f0f9ff" : "inherit",
+                      bgcolor: selectedEntry === index.toString() ? colors.surfaceSelected : "inherit",
                     }}
                     onClick={() => setSelectedEntry(index.toString())}
                   >
@@ -103,20 +108,20 @@ export function AuditLog() {
                     <TableCell sx={{ fontSize: 12 }}>
                       {entry.previousValue && entry.newValue && (
                         <Box>
-                          <Typography variant="caption" sx={{ color: "#ef4444" }}>
+                          <Typography variant="caption" sx={{ color: statuses.error.icon }}>
                             {entry.previousValue}
                           </Typography>
                           <Typography variant="caption" sx={{ mx: 0.5 }}>→</Typography>
-                          <Typography variant="caption" sx={{ color: "#10b981" }}>
+                          <Typography variant="caption" sx={{ color: statuses.approved.icon }}>
                             {entry.newValue}
                           </Typography>
                         </Box>
                       )}
                     </TableCell>
-                    <TableCell sx={{ fontFamily: "monospace", fontSize: 12, color: "#64748b" }}>
+                    <TableCell sx={{ fontFamily: "monospace", fontSize: 12, color: "text.secondary" }}>
                       {entry.ipAddress}
                     </TableCell>
-                    <TableCell sx={{ fontSize: 12, color: "#64748b", maxWidth: 250 }}>
+                    <TableCell sx={{ fontSize: 12, color: "text.secondary", maxWidth: 250 }}>
                       {entry.reason || "—"}
                     </TableCell>
                   </TableRow>
@@ -140,15 +145,15 @@ export function AuditLog() {
             <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>Audit Event Details</Typography>
 
             <Box sx={{ mb: 2 }}>
-              <Typography variant="caption" sx={{ color: "#64748b" }}>Timestamp</Typography>
+              <Typography variant="caption" sx={{ color: "text.secondary" }}>Timestamp</Typography>
               <Typography variant="body2" sx={{ fontFamily: "monospace", mb: 2 }}>
                 {new Date(selectedAuditEntry.timestamp).toLocaleString()}
               </Typography>
 
-              <Typography variant="caption" sx={{ color: "#64748b" }}>Actor</Typography>
+              <Typography variant="caption" sx={{ color: "text.secondary" }}>Actor</Typography>
               <Typography variant="body2" sx={{ mb: 2 }}>{selectedAuditEntry.actor}</Typography>
 
-              <Typography variant="caption" sx={{ color: "#64748b" }}>Action</Typography>
+              <Typography variant="caption" sx={{ color: "text.secondary" }}>Action</Typography>
               <Box sx={{ mb: 2 }}>
                 <Chip
                   label={selectedAuditEntry.action}
@@ -156,12 +161,12 @@ export function AuditLog() {
                 />
               </Box>
 
-              <Typography variant="caption" sx={{ color: "#64748b" }}>Entity</Typography>
+              <Typography variant="caption" sx={{ color: "text.secondary" }}>Entity</Typography>
               <Typography variant="body2" sx={{ fontFamily: "monospace", mb: 2 }}>
                 {selectedAuditEntry.entity}
               </Typography>
 
-              <Typography variant="caption" sx={{ color: "#64748b" }}>IP Address</Typography>
+              <Typography variant="caption" sx={{ color: "text.secondary" }}>IP Address</Typography>
               <Typography variant="body2" sx={{ fontFamily: "monospace", mb: 2 }}>
                 {selectedAuditEntry.ipAddress}
               </Typography>
@@ -171,18 +176,18 @@ export function AuditLog() {
               <>
                 <Divider sx={{ my: 2 }} />
                 <Box sx={{ mb: 2 }}>
-                  <Typography variant="caption" sx={{ color: "#64748b" }}>Previous Value</Typography>
-                  <Paper sx={{ p: 1.5, bgcolor: "#fef2f2", mt: 0.5 }}>
-                    <Typography variant="body2" sx={{ fontFamily: "monospace", fontSize: 13, color: "#991b1b" }}>
+                  <Typography variant="caption" sx={{ color: "text.secondary" }}>Previous Value</Typography>
+                  <Paper sx={{ p: 1.5, bgcolor: statuses.error.bg, mt: 0.5 }}>
+                    <Typography variant="body2" sx={{ fontFamily: "monospace", fontSize: 13, color: statuses.error.color }}>
                       {selectedAuditEntry.previousValue}
                     </Typography>
                   </Paper>
                 </Box>
 
                 <Box sx={{ mb: 2 }}>
-                  <Typography variant="caption" sx={{ color: "#64748b" }}>New Value</Typography>
-                  <Paper sx={{ p: 1.5, bgcolor: "#f0fdf4", mt: 0.5 }}>
-                    <Typography variant="body2" sx={{ fontFamily: "monospace", fontSize: 13, color: "#166534" }}>
+                  <Typography variant="caption" sx={{ color: "text.secondary" }}>New Value</Typography>
+                  <Paper sx={{ p: 1.5, bgcolor: statuses.approved.bg, mt: 0.5 }}>
+                    <Typography variant="body2" sx={{ fontFamily: "monospace", fontSize: 13, color: statuses.approved.color }}>
                       {selectedAuditEntry.newValue}
                     </Typography>
                   </Paper>
@@ -194,7 +199,7 @@ export function AuditLog() {
               <>
                 <Divider sx={{ my: 2 }} />
                 <Box>
-                  <Typography variant="caption" sx={{ color: "#64748b" }}>Reason</Typography>
+                  <Typography variant="caption" sx={{ color: "text.secondary" }}>Reason</Typography>
                   <Typography variant="body2" sx={{ mt: 0.5 }}>
                     {selectedAuditEntry.reason}
                   </Typography>
@@ -205,13 +210,13 @@ export function AuditLog() {
             <Divider sx={{ my: 2 }} />
 
             <Box>
-              <Typography variant="caption" sx={{ color: "#64748b", display: "block", mb: 1 }}>
+              <Typography variant="caption" sx={{ color: "text.secondary", display: "block", mb: 1 }}>
                 Full Event Metadata
               </Typography>
               <Box
                 component="pre"
                 sx={{
-                  bgcolor: "#0f172a",
+                  bgcolor: theme.palette.mode === "dark" ? "#020617" : "#0f172a",
                   color: "#e2e8f0",
                   p: 2,
                   borderRadius: 1,

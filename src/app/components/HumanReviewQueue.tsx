@@ -20,19 +20,24 @@ import {
   Divider,
   Alert,
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import { Clock, AlertTriangle } from "lucide-react";
 import { mockPayments } from "../data/mockData";
+import { appColors, statusColors } from "../themeTokens";
 
 export function HumanReviewQueue() {
+  const theme = useTheme();
+  const colors = appColors(theme);
+  const statuses = statusColors(theme);
   const [selectedReview, setSelectedReview] = useState<string | null>(null);
 
   const reviewQueue = mockPayments.filter(p => p.decision === "review_required");
   const selectedPayment = reviewQueue.find(p => p.id === selectedReview) || reviewQueue[0];
 
   const getSLAColor = (hours: number) => {
-    if (hours < 2) return "#10b981";
-    if (hours < 4) return "#f59e0b";
-    return "#ef4444";
+    if (hours < 2) return statuses.healthy.icon;
+    if (hours < 4) return statuses.warning.icon;
+    return statuses.error.icon;
   };
 
   return (
@@ -80,13 +85,13 @@ export function HumanReviewQueue() {
             <Table stickyHeader size="small">
               <TableHead>
                 <TableRow>
-                  <TableCell sx={{ fontWeight: 600, bgcolor: "#f8f9fa" }}>Priority</TableCell>
-                  <TableCell sx={{ fontWeight: 600, bgcolor: "#f8f9fa" }}>Payment ID</TableCell>
-                  <TableCell sx={{ fontWeight: 600, bgcolor: "#f8f9fa" }}>Amount</TableCell>
-                  <TableCell sx={{ fontWeight: 600, bgcolor: "#f8f9fa" }}>Risk Score</TableCell>
-                  <TableCell sx={{ fontWeight: 600, bgcolor: "#f8f9fa" }}>Top Risk Reasons</TableCell>
-                  <TableCell sx={{ fontWeight: 600, bgcolor: "#f8f9fa" }}>SLA Deadline</TableCell>
-                  <TableCell sx={{ fontWeight: 600, bgcolor: "#f8f9fa" }}>Assignee</TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>Priority</TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>Payment ID</TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>Amount</TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>Risk Score</TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>Top Risk Reasons</TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>SLA Deadline</TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>Assignee</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -100,7 +105,7 @@ export function HumanReviewQueue() {
                       hover
                       sx={{
                         cursor: "pointer",
-                        bgcolor: isSelected ? "#f0f9ff" : "inherit",
+                        bgcolor: isSelected ? colors.surfaceSelected : "inherit",
                       }}
                       onClick={() => setSelectedReview(payment.id)}
                     >
@@ -118,13 +123,13 @@ export function HumanReviewQueue() {
                           label={payment.riskScore}
                           size="small"
                           sx={{
-                            bgcolor: payment.riskScore >= 60 ? "#fee2e2" : "#fef3c7",
-                            color: payment.riskScore >= 60 ? "#991b1b" : "#92400e",
+                            color: payment.riskScore >= 60 ? statuses.error.color : statuses.warning.color,
+                            backgroundColor: payment.riskScore >= 60 ? statuses.error.bg : statuses.warning.bg,
                             fontWeight: 600,
                           }}
                         />
                       </TableCell>
-                      <TableCell sx={{ fontSize: 12, color: "#64748b", maxWidth: 200 }}>
+                      <TableCell sx={{ fontSize: 12, color: "text.secondary", maxWidth: 200 }}>
                         {payment.triggeredSignals.slice(0, 2).join(", ")}
                       </TableCell>
                       <TableCell>
@@ -165,25 +170,25 @@ export function HumanReviewQueue() {
           <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600 }}>Payment Summary</Typography>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
             <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-              <Typography variant="caption" sx={{ color: "#64748b" }}>Payment ID</Typography>
+              <Typography variant="caption" sx={{ color: "text.secondary" }}>Payment ID</Typography>
               <Typography variant="body2" sx={{ fontFamily: "monospace", fontSize: 13 }}>
                 {selectedPayment.id}
               </Typography>
             </Box>
             <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-              <Typography variant="caption" sx={{ color: "#64748b" }}>Amount</Typography>
+              <Typography variant="caption" sx={{ color: "text.secondary" }}>Amount</Typography>
               <Typography variant="body2" sx={{ fontWeight: 600 }}>
                 {selectedPayment.amount.toLocaleString()} {selectedPayment.currency}
               </Typography>
             </Box>
             <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-              <Typography variant="caption" sx={{ color: "#64748b" }}>User</Typography>
+              <Typography variant="caption" sx={{ color: "text.secondary" }}>User</Typography>
               <Typography variant="body2" sx={{ fontFamily: "monospace", fontSize: 13 }}>
                 {selectedPayment.user}
               </Typography>
             </Box>
             <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-              <Typography variant="caption" sx={{ color: "#64748b" }}>Recipient</Typography>
+              <Typography variant="caption" sx={{ color: "text.secondary" }}>Recipient</Typography>
               <Typography variant="body2" sx={{ fontFamily: "monospace", fontSize: 13 }}>
                 {selectedPayment.recipient}
               </Typography>
@@ -199,7 +204,7 @@ export function HumanReviewQueue() {
           <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
             {selectedPayment.triggeredSignals.map((signal) => (
               <Box key={signal} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <AlertTriangle size={14} color="#f59e0b" />
+                <AlertTriangle size={14} color={statuses.warning.icon} />
                 <Typography variant="body2" sx={{ fontSize: 13 }}>{signal}</Typography>
               </Box>
             ))}
@@ -214,15 +219,15 @@ export function HumanReviewQueue() {
           <Box sx={{ display: "flex", gap: 2 }}>
             <Box>
               <Typography variant="h6" sx={{ fontWeight: 600 }}>47</Typography>
-              <Typography variant="caption" sx={{ color: "#64748b" }}>Total Payments</Typography>
+              <Typography variant="caption" sx={{ color: "text.secondary" }}>Total Payments</Typography>
             </Box>
             <Box>
-              <Typography variant="h6" sx={{ fontWeight: 600, color: "#10b981" }}>45</Typography>
-              <Typography variant="caption" sx={{ color: "#64748b" }}>Successful</Typography>
+              <Typography variant="h6" sx={{ fontWeight: 600, color: statuses.healthy.icon }}>45</Typography>
+              <Typography variant="caption" sx={{ color: "text.secondary" }}>Successful</Typography>
             </Box>
             <Box>
-              <Typography variant="h6" sx={{ fontWeight: 600, color: "#ef4444" }}>2</Typography>
-              <Typography variant="caption" sx={{ color: "#64748b" }}>Blocked</Typography>
+              <Typography variant="h6" sx={{ fontWeight: 600, color: statuses.blocked.icon }}>2</Typography>
+              <Typography variant="caption" sx={{ color: "text.secondary" }}>Blocked</Typography>
             </Box>
           </Box>
         </Box>
@@ -256,7 +261,7 @@ export function HumanReviewQueue() {
           <Button
             variant="contained"
             fullWidth
-            sx={{ bgcolor: "#10b981", "&:hover": { bgcolor: "#059669" } }}
+            sx={{ bgcolor: statuses.approved.icon, "&:hover": { bgcolor: theme.palette.success.dark } }}
           >
             Approve Payment
           </Button>

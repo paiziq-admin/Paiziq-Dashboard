@@ -19,10 +19,15 @@ import {
   Tab,
   Alert,
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import { Save, PlayCircle, Upload } from "lucide-react";
 import { riskRules } from "../data/mockData";
+import { appColors, statusColors } from "../themeTokens";
 
 export function RiskPolicies() {
+  const theme = useTheme();
+  const colors = appColors(theme);
+  const statuses = statusColors(theme);
   const [activeTab, setActiveTab] = useState(0);
   const [allowThreshold, setAllowThreshold] = useState(39);
   const [reviewThreshold, setReviewThreshold] = useState(69);
@@ -49,17 +54,17 @@ export function RiskPolicies() {
               <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>Active Policy</Typography>
               <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
                 <Box>
-                  <Typography variant="caption" sx={{ color: "#64748b" }}>Policy Version</Typography>
+                  <Typography variant="caption" sx={{ color: "text.secondary" }}>Policy Version</Typography>
                   <Typography variant="h6" sx={{ fontFamily: "monospace" }}>v2.3.1</Typography>
                 </Box>
                 <Box>
-                  <Typography variant="caption" sx={{ color: "#64748b" }}>Status</Typography>
+                  <Typography variant="caption" sx={{ color: "text.secondary" }}>Status</Typography>
                   <Box>
-                    <Chip label="Active" size="small" sx={{ bgcolor: "#dcfce7", color: "#166534", mt: 0.5 }} />
+                    <Chip label="Active" size="small" sx={{ bgcolor: statuses.approved.bg, color: statuses.approved.color, mt: 0.5 }} />
                   </Box>
                 </Box>
                 <Box>
-                  <Typography variant="caption" sx={{ color: "#64748b" }}>Last Updated</Typography>
+                  <Typography variant="caption" sx={{ color: "text.secondary" }}>Last Updated</Typography>
                   <Typography variant="body2" sx={{ mt: 0.5 }}>2026-05-20 14:32 UTC</Typography>
                 </Box>
               </Box>
@@ -77,7 +82,7 @@ export function RiskPolicies() {
                     <Chip
                       label={`0-${allowThreshold}`}
                       size="small"
-                      sx={{ bgcolor: "#dcfce7", color: "#166534", fontWeight: 600 }}
+                      sx={{ bgcolor: statuses.approved.bg, color: statuses.approved.color, fontWeight: 600 }}
                     />
                   </Box>
                   <Slider
@@ -85,7 +90,7 @@ export function RiskPolicies() {
                     onChange={(_, v) => setAllowThreshold(v as number)}
                     min={0}
                     max={100}
-                    sx={{ color: "#10b981" }}
+                    sx={{ color: statuses.approved.icon }}
                   />
                 </Box>
 
@@ -97,7 +102,7 @@ export function RiskPolicies() {
                     <Chip
                       label={`${allowThreshold + 1}-${reviewThreshold}`}
                       size="small"
-                      sx={{ bgcolor: "#fef3c7", color: "#92400e", fontWeight: 600 }}
+                      sx={{ bgcolor: statuses.warning.bg, color: statuses.warning.color, fontWeight: 600 }}
                     />
                   </Box>
                   <Slider
@@ -105,7 +110,7 @@ export function RiskPolicies() {
                     onChange={(_, v) => setReviewThreshold(v as number)}
                     min={0}
                     max={100}
-                    sx={{ color: "#f59e0b" }}
+                    sx={{ color: statuses.warning.icon }}
                   />
                 </Box>
 
@@ -115,10 +120,10 @@ export function RiskPolicies() {
                     <Chip
                       label={`${reviewThreshold + 1}+`}
                       size="small"
-                      sx={{ bgcolor: "#fee2e2", color: "#991b1b", fontWeight: 600 }}
+                      sx={{ bgcolor: statuses.blocked.bg, color: statuses.blocked.color, fontWeight: 600 }}
                     />
                   </Box>
-                  <Slider value={reviewThreshold} min={0} max={100} disabled sx={{ color: "#ef4444" }} />
+                  <Slider value={reviewThreshold} min={0} max={100} disabled sx={{ color: statuses.blocked.icon }} />
                 </Box>
               </Box>
             </Paper>
@@ -139,7 +144,7 @@ export function RiskPolicies() {
                   <TableRow>
                     <TableCell sx={{ fontFamily: "monospace" }}>v2.3.1</TableCell>
                     <TableCell>
-                      <Chip label="Active" size="small" sx={{ bgcolor: "#dcfce7", color: "#166534" }} />
+                      <Chip label="Active" size="small" sx={{ bgcolor: statuses.approved.bg, color: statuses.approved.color }} />
                     </TableCell>
                     <TableCell>2026-05-20 14:32</TableCell>
                     <TableCell>admin@company.com</TableCell>
@@ -188,7 +193,7 @@ export function RiskPolicies() {
                   variant="contained"
                   startIcon={<Upload />}
                   fullWidth
-                  sx={{ bgcolor: "#3b82f6", "&:hover": { bgcolor: "#2563eb" } }}
+                  sx={{ bgcolor: "primary.main", "&:hover": { bgcolor: "primary.dark" } }}
                 >
                   Publish Policy
                 </Button>
@@ -202,11 +207,11 @@ export function RiskPolicies() {
               </Alert>
               <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                 <Box>
-                  <Typography variant="caption" sx={{ color: "#64748b" }}>Payments Affected</Typography>
+                  <Typography variant="caption" sx={{ color: "text.secondary" }}>Payments Affected</Typography>
                   <Typography variant="h6">+142 to review queue</Typography>
                 </Box>
                 <Box>
-                  <Typography variant="caption" sx={{ color: "#64748b" }}>Estimated Review Load</Typography>
+                  <Typography variant="caption" sx={{ color: "text.secondary" }}>Estimated Review Load</Typography>
                   <Typography variant="h6">+15% workload</Typography>
                 </Box>
               </Box>
@@ -234,7 +239,7 @@ export function RiskPolicies() {
                 {riskRules.map((rule) => (
                   <TableRow key={rule.name} hover>
                     <TableCell sx={{ fontWeight: 500 }}>{rule.name}</TableCell>
-                    <TableCell sx={{ color: "#64748b", fontSize: 13 }}>{rule.description}</TableCell>
+                    <TableCell sx={{ color: "text.secondary", fontSize: 13 }}>{rule.description}</TableCell>
                     <TableCell>
                       <TextField
                         size="small"
@@ -247,7 +252,7 @@ export function RiskPolicies() {
                     <TableCell>
                       <Switch defaultChecked={rule.enabled} />
                     </TableCell>
-                    <TableCell sx={{ fontSize: 13, color: "#64748b" }}>{rule.lastUpdated}</TableCell>
+                    <TableCell sx={{ fontSize: 13, color: "text.secondary" }}>{rule.lastUpdated}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -273,7 +278,7 @@ export function RiskPolicies() {
               />
               <Button variant="outlined" fullWidth>Add to Allow List</Button>
               <Box sx={{ mt: 3 }}>
-                <Typography variant="caption" sx={{ color: "#64748b", display: "block", mb: 1 }}>
+                <Typography variant="caption" sx={{ color: "text.secondary", display: "block", mb: 1 }}>
                   Current Entries (3)
                 </Typography>
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
@@ -299,7 +304,7 @@ export function RiskPolicies() {
               />
               <Button variant="outlined" color="error" fullWidth>Add to Block List</Button>
               <Box sx={{ mt: 3 }}>
-                <Typography variant="caption" sx={{ color: "#64748b", display: "block", mb: 1 }}>
+                <Typography variant="caption" sx={{ color: "text.secondary", display: "block", mb: 1 }}>
                   Current Entries (2)
                 </Typography>
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
@@ -336,18 +341,18 @@ export function RiskPolicies() {
             </Grid>
 
             <Grid item xs={12} md={6}>
-              <Paper sx={{ p: 3, bgcolor: "#f8f9fa" }}>
+              <Paper sx={{ p: 3, bgcolor: colors.surfaceAlt }}>
                 <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>Simulated Result</Typography>
 
                 <Box sx={{ mb: 3 }}>
-                  <Typography variant="caption" sx={{ color: "#64748b", display: "block", mb: 1 }}>
+                  <Typography variant="caption" sx={{ color: "text.secondary", display: "block", mb: 1 }}>
                     Predicted Risk Score
                   </Typography>
                   <Chip
                     label={simulateScore}
                     sx={{
-                      bgcolor: simulateScore >= 70 ? "#fee2e2" : simulateScore >= 40 ? "#fef3c7" : "#dcfce7",
-                      color: simulateScore >= 70 ? "#991b1b" : simulateScore >= 40 ? "#92400e" : "#166534",
+                      bgcolor: simulateScore >= 70 ? statuses.error.bg : simulateScore >= 40 ? statuses.warning.bg : statuses.approved.bg,
+                      color: simulateScore >= 70 ? statuses.error.color : simulateScore >= 40 ? statuses.warning.color : statuses.approved.color,
                       fontSize: 24,
                       fontWeight: 700,
                       height: 48,
@@ -357,35 +362,35 @@ export function RiskPolicies() {
                 </Box>
 
                 <Box sx={{ mb: 3 }}>
-                  <Typography variant="caption" sx={{ color: "#64748b", display: "block", mb: 1 }}>
+                  <Typography variant="caption" sx={{ color: "text.secondary", display: "block", mb: 1 }}>
                     Predicted Decision
                   </Typography>
                   <Chip
                     label="Review Required"
-                    sx={{ bgcolor: "#fef3c7", color: "#92400e", fontWeight: 600 }}
+                    sx={{ bgcolor: statuses.warning.bg, color: statuses.warning.color, fontWeight: 600 }}
                   />
                 </Box>
 
                 <Box>
-                  <Typography variant="caption" sx={{ color: "#64748b", display: "block", mb: 1 }}>
+                  <Typography variant="caption" sx={{ color: "text.secondary", display: "block", mb: 1 }}>
                     Contributing Factors
                   </Typography>
                   <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                     <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                       <Typography variant="body2">High amount</Typography>
-                      <Typography variant="body2" sx={{ color: "#ef4444", fontWeight: 600 }}>+20</Typography>
+                      <Typography variant="body2" sx={{ color: statuses.error.icon, fontWeight: 600 }}>+20</Typography>
                     </Box>
                     <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                       <Typography variant="body2">New recipient</Typography>
-                      <Typography variant="body2" sx={{ color: "#ef4444", fontWeight: 600 }}>+15</Typography>
+                      <Typography variant="body2" sx={{ color: statuses.error.icon, fontWeight: 600 }}>+15</Typography>
                     </Box>
                     <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                       <Typography variant="body2">New device</Typography>
-                      <Typography variant="body2" sx={{ color: "#ef4444", fontWeight: 600 }}>+12</Typography>
+                      <Typography variant="body2" sx={{ color: statuses.error.icon, fontWeight: 600 }}>+12</Typography>
                     </Box>
                     <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                       <Typography variant="body2">User history</Typography>
-                      <Typography variant="body2" sx={{ color: "#10b981", fontWeight: 600 }}>-2</Typography>
+                      <Typography variant="body2" sx={{ color: statuses.approved.icon, fontWeight: 600 }}>-2</Typography>
                     </Box>
                   </Box>
                 </Box>
