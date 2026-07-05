@@ -1,31 +1,31 @@
 export function RiskDistributionBars() {
+  const buckets = [
+    { label: "0-20", value: "1,580", height: "100%", color: "#4a8a68", opacity: 0.85 },
+    { label: "21-40", value: "720", height: "46%", color: "#4a8a68", opacity: 0.55 },
+    { label: "41-60", value: "380", height: "24%", color: "#d9973b", opacity: 0.85 },
+    { label: "61-80", value: "130", height: "8%", color: "#c05b47", opacity: 0.75 },
+    { label: "81-100", value: "37", height: "3%", color: "#c05b47", opacity: 1 },
+  ];
+
   return (
-    <svg aria-label="Risk score distribution" className="block h-auto w-full" role="img" viewBox="0 0 600 170">
-      <g stroke="rgba(86,66,86,0.10)" strokeDasharray="3 4">
-        <line x1="30" x2="590" y1="20" y2="20" />
-        <line x1="30" x2="590" y1="80" y2="80" />
-        <line x1="30" x2="590" y1="140" y2="140" />
-      </g>
-      <rect fill="#4a8a68" height="119" opacity="0.85" rx="6" width="70" x="55" y="21" />
-      <rect fill="#4a8a68" height="54" opacity="0.55" rx="6" width="70" x="165" y="86" />
-      <rect fill="#d9973b" height="29" opacity="0.85" rx="6" width="70" x="275" y="111" />
-      <rect fill="#c05b47" height="10" opacity="0.75" rx="4" width="70" x="385" y="130" />
-      <rect fill="#c05b47" height="3" rx="1.5" width="70" x="495" y="137" />
-      <g fill="#96939b" fontFamily="IBM Plex Mono, monospace" fontSize="11" textAnchor="middle">
-        <text x="90" y="158">0-20</text>
-        <text x="200" y="158">21-40</text>
-        <text x="310" y="158">41-60</text>
-        <text x="420" y="158">61-80</text>
-        <text x="530" y="158">81-100</text>
-      </g>
-      <g fill="#5c5462" fontFamily="Hanken Grotesk, sans-serif" fontSize="11" fontWeight="600" textAnchor="middle">
-        <text x="90" y="14">1,580</text>
-        <text x="200" y="79">720</text>
-        <text x="310" y="104">380</text>
-        <text x="420" y="124">130</text>
-        <text x="530" y="131">37</text>
-      </g>
-    </svg>
+    <div aria-label="Risk score distribution" className="relative h-[220px] pt-[8px]" role="img">
+      <div className="absolute inset-x-[18px] top-[34px] bottom-[48px] flex flex-col justify-between">
+        <span className="border-t border-dashed border-[rgba(86,66,86,0.10)]" />
+        <span className="border-t border-dashed border-[rgba(86,66,86,0.10)]" />
+        <span className="border-t border-dashed border-[rgba(86,66,86,0.10)]" />
+      </div>
+      <div className="relative z-[1] grid h-full grid-cols-5 items-end gap-[28px] px-[34px] max-[900px]:gap-[14px] max-[640px]:px-[12px]">
+        {buckets.map((bucket) => (
+          <div className="flex h-full min-w-0 flex-col justify-end gap-[10px]" key={bucket.label}>
+            <div className="flex h-[150px] flex-col justify-end">
+              <div className="mb-[8px] text-center text-[18px] font-extrabold leading-none text-[var(--text-secondary)]">{bucket.value}</div>
+              <div className="min-h-[4px] rounded-[8px]" style={{ background: bucket.color, height: bucket.height, opacity: bucket.opacity }} />
+            </div>
+            <div className="mono truncate text-center text-[15px] text-[var(--muted-foreground)]">{bucket.label}</div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 

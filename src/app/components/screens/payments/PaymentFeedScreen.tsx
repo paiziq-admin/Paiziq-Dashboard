@@ -4,7 +4,7 @@ import { payments, type PaymentDecision } from "../../../data/payments";
 import { formatAmount, formatTime, truncateSignals } from "../../../lib/formatters";
 import { DecisionBadge, EmptyState, FilterBar, GlassPanel, GridCell, GridRow, GridTable, RiskBadge, StatusBadge, StatusDot } from "../../primitives";
 
-const columns = "minmax(150px,1.1fr) 100px minmax(130px,1fr) 90px 110px minmax(110px,1fr) 60px 130px minmax(120px,1fr)";
+const columns = "minmax(150px,1.1fr) 136px minmax(140px,1fr) 90px 120px minmax(120px,1fr) 64px 136px minmax(140px,1fr)";
 
 export function PaymentFeedScreen() {
   const [decision, setDecision] = useState<PaymentDecision | "all">("all");
