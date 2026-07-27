@@ -8,18 +8,26 @@ import {
   Settings,
   Shield,
   TriangleAlert,
+  type LucideIcon,
 } from "lucide-react";
 
-export const navItems = [
+interface NavItem {
+  label: string;
+  path: string;
+  key: string;
+  icon: LucideIcon;
+}
+
+export const navItems: readonly NavItem[] = [
   { label: "Overview", path: "/", key: "overview", icon: LayoutDashboard },
   { label: "Payment Feed", path: "/payments", key: "payments", icon: CreditCard },
-  { label: "Human Reviews", path: "/reviews", key: "reviews", icon: ClipboardCheck, badge: 3 },
+  { label: "Human Reviews", path: "/reviews", key: "reviews", icon: ClipboardCheck },
   { label: "Risk Policies", path: "/policies", key: "policies", icon: Shield },
   { label: "Agents & SDK", path: "/agents", key: "agents", icon: Activity },
   { label: "Audit Log", path: "/audit", key: "audit", icon: FileText },
-  { label: "Alerts", path: "/alerts", key: "alerts", icon: TriangleAlert, badge: 2 },
+  { label: "Alerts", path: "/alerts", key: "alerts", icon: TriangleAlert },
   { label: "Settings", path: "/settings", key: "settings", icon: Settings },
-] as const;
+];
 
 export function activeNavKey(pathname: string) {
   if (pathname === "/") return "overview";
@@ -29,4 +37,3 @@ export function activeNavKey(pathname: string) {
 }
 
 export const notificationIcon = Bell;
-

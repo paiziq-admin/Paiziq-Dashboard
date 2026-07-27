@@ -1,30 +1,87 @@
-import { createBrowserRouter } from "react-router";
+import { lazy, Suspense, type ReactNode } from "react";
+import { createBrowserRouter, Navigate } from "react-router";
 import { DashboardShell } from "./components/layout/DashboardShell";
-import { OverviewScreen } from "./components/screens/overview/OverviewScreen";
-import { PaymentFeedScreen } from "./components/screens/payments/PaymentFeedScreen";
-import { PaymentDetailScreen } from "./components/screens/payments/PaymentDetailScreen";
-import { HumanReviewsScreen } from "./components/screens/reviews/HumanReviewsScreen";
-import { PoliciesScreen } from "./components/screens/policies/PoliciesScreen";
-import { AgentsScreen } from "./components/screens/agents/AgentsScreen";
-import { AuditScreen } from "./components/screens/audit/AuditScreen";
-import { AlertsScreen } from "./components/screens/alerts/AlertsScreen";
-import { SettingsScreen } from "./components/screens/settings/SettingsScreen";
+import { LoginScreen } from "./components/auth/LoginScreen";
+import { PublicOnly, RequireSession } from "./components/auth/RequireSession";
+import { LoadingState } from "./components/feedback/AsyncBoundary";
+
+const OverviewScreen = lazy(() =>
+  import("./components/screens/overview/OverviewScreen").then((module) => ({
+    default: module.OverviewScreen,
+  })),
+);
+const PaymentFeedScreen = lazy(() =>
+  import("./components/screens/payments/PaymentFeedScreen").then((module) => ({
+    default: module.PaymentFeedScreen,
+  })),
+);
+const PaymentDetailScreen = lazy(() =>
+  import("./components/screens/payments/PaymentDetailScreen").then((module) => ({
+    default: module.PaymentDetailScreen,
+  })),
+);
+const HumanReviewsScreen = lazy(() =>
+  import("./components/screens/reviews/HumanReviewsScreen").then((module) => ({
+    default: module.HumanReviewsScreen,
+  })),
+);
+const PoliciesScreen = lazy(() =>
+  import("./components/screens/policies/PoliciesScreen").then((module) => ({
+    default: module.PoliciesScreen,
+  })),
+);
+const AgentsScreen = lazy(() =>
+  import("./components/screens/agents/AgentsScreen").then((module) => ({
+    default: module.AgentsScreen,
+  })),
+);
+const AuditScreen = lazy(() =>
+  import("./components/screens/audit/AuditScreen").then((module) => ({
+    default: module.AuditScreen,
+  })),
+);
+const AlertsScreen = lazy(() =>
+  import("./components/screens/alerts/AlertsScreen").then((module) => ({
+    default: module.AlertsScreen,
+  })),
+);
+const SettingsScreen = lazy(() =>
+  import("./components/screens/settings/SettingsScreen").then((module) => ({
+    default: module.SettingsScreen,
+  })),
+);
+
+function routeElement(node: ReactNode) {
+  return <Suspense fallback={<LoadingState label="Opening screen" />}>{node}</Suspense>;
+}
 
 export const router = createBrowserRouter([
   {
+    path: "/login",
+    element: (
+      <PublicOnly>
+        <LoginScreen />
+      </PublicOnly>
+    ),
+  },
+  {
     path: "/",
-    Component: DashboardShell,
+    element: (
+      <RequireSession>
+        <DashboardShell />
+      </RequireSession>
+    ),
     children: [
-      { index: true, Component: OverviewScreen },
-      { path: "payments", Component: PaymentFeedScreen },
-      { path: "payments/:id", Component: PaymentDetailScreen },
-      { path: "reviews", Component: HumanReviewsScreen },
-      { path: "policies", Component: PoliciesScreen },
-      { path: "agents", Component: AgentsScreen },
-      { path: "audit", Component: AuditScreen },
-      { path: "alerts", Component: AlertsScreen },
-      { path: "settings", Component: SettingsScreen },
+      { index: true, element: routeElement(<OverviewScreen />) },
+      { path: "payments", element: routeElement(<PaymentFeedScreen />) },
+      { path: "payments/:id", element: routeElement(<PaymentDetailScreen />) },
+      { path: "reviews", element: routeElement(<HumanReviewsScreen />) },
+      { path: "policies", element: routeElement(<PoliciesScreen />) },
+      { path: "agents", element: routeElement(<AgentsScreen />) },
+      { path: "audit", element: routeElement(<AuditScreen />) },
+      { path: "alerts", element: routeElement(<AlertsScreen />) },
+      { path: "settings", element: routeElement(<SettingsScreen />) },
+      { path: "*", element: <Navigate replace to="/" /> },
     ],
   },
 ]);
-

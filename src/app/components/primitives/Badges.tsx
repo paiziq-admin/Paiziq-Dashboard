@@ -1,7 +1,14 @@
 import type { HTMLAttributes } from "react";
 import { cn } from "../ui/utils";
-import { auditActionStyle, decisionLabel, decisionStyle, riskStyle, toneStyle, type BadgeTone } from "../../lib/risk";
-import type { PaymentDecision } from "../../data/payments";
+import {
+  auditActionStyle,
+  decisionLabel,
+  decisionStyle,
+  riskStyle,
+  toneStyle,
+  type BadgeTone,
+  type DecisionStatus,
+} from "../../lib/risk";
 
 interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
   tone?: BadgeTone;
@@ -37,7 +44,7 @@ export function RiskBadge({ score, size = "sm" }: { score: number; size?: "sm" |
   );
 }
 
-export function DecisionBadge({ decision }: { decision: PaymentDecision }) {
+export function DecisionBadge({ decision }: { decision: DecisionStatus }) {
   return (
     <span
       className="inline-flex items-center whitespace-nowrap rounded-[999px] px-[10px] py-[2px] text-[11.5px] font-bold"
@@ -83,4 +90,3 @@ export function StatusDot({
     />
   );
 }
-
