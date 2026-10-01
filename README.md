@@ -22,6 +22,38 @@ npm run dev
 npm run build
 ```
 
+## Azure Deployment
+
+The development dashboard is hosted at https://brave-river-0a6dd1310.5.azurestaticapps.net
+using Azure Static Web Apps (Free), in resource group `paiziq-dev`, Central US.
+It currently displays mock data. Deployment uploads the `dist` build without a
+server. `public/staticwebapp.config.json` enables direct links
+and refreshes on React routes and is copied into `dist` by Vite.
+
+### Manual GitHub deployment
+
+Push your changes, then open the repository's **Actions** tab, select
+**Deploy dashboard to Azure**, click **Run workflow**, choose the branch containing
+your changes (normally `main`), and click **Run workflow** again. The selected
+branch is built and deployed to the existing live development dashboard.
+Pushes and pull requests do not trigger deployment.
+
+The workflow uses the repository secret `AZURE_STATIC_WEB_APPS_API_TOKEN`.
+Only one deployment runs at a time.
+
+### Local deployment
+
+After signing in with `az login`, you can also redeploy locally:
+
+```bash
+npm run build
+SWA_CLI_DEPLOYMENT_TOKEN="$(az staticwebapp secrets list \
+  --subscription 8406cce0-3a67-4d8e-b536-965b930989af \
+  --resource-group paiziq-dev --name paiziq-dashboard-dev \
+  --query properties.apiKey --output tsv)" \
+  npx -y @azure/static-web-apps-cli@2.0.10 deploy ./dist --env production --no-use-keychain
+```
+
 ## Routes
 
 - `/` - Overview
@@ -48,4 +80,3 @@ npm run build
 ## Dependency Policy
 
 The active dashboard no longer imports MUI page components. MUI, Emotion, and Recharts may still appear in `package.json` because the original Figma bundle included them and local shadcn files may still reference Recharts in unused utilities. Remove package dependencies only after confirming no current or planned screens import them.
-
