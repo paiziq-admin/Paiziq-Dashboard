@@ -24,9 +24,10 @@
 
 ## Implementation inventory
 
-Source digest: `c3a33eeb3746032eab72abf1f668a2c21e8c128a5aaf60854398359a1eaa3610`
+Source digest: `56af9efc24e529b3a86dfce13d402a01406a80122f35e049e2f739e1bd2242f6`
 
 - `.github/workflows/ci.yml`
+- `.github/workflows/notify-ci.yml`
 - `.gitignore`
 - `e2e/dashboard.spec.ts`
 - `e2e/fixture/payment-agent-workflow.fixture.e2e.spec.ts`
@@ -71,6 +72,7 @@ Source digest: `c3a33eeb3746032eab72abf1f668a2c21e8c128a5aaf60854398359a1eaa3610
 - `src/app/components/primitives/GridTable.tsx`
 - `src/app/components/primitives/KeyValueGrid.tsx`
 - `src/app/components/primitives/MetricCard.tsx`
+- `src/app/components/primitives/PaiziqLogo.tsx`
 - `src/app/components/primitives/SegmentedTabs.tsx`
 - `src/app/components/primitives/Timeline.tsx`
 - `src/app/components/primitives/index.ts`
@@ -170,18 +172,47 @@ npm run test:e2e
 npm run test:e2e:service
 ```
 
-`npm run check` runs lint, typecheck, unit/component tests, the production build, and the generated-document freshness check. Playwright E2E is separate and is configured in CI after the quality job. These are available gates, not a claim that an arbitrary checkout or backend is currently passing.
+## Azure Deployment
 
-## Architecture and contracts
+The development dashboard is hosted at https://brave-river-0a6dd1310.5.azurestaticapps.net
+using Azure Static Web Apps (Free), in resource group `paiziq-dev`, Central US.
+It connects to the live backend through the login screen. Deployment uploads the `dist` build without a
+server. `public/staticwebapp.config.json` enables direct links
+and refreshes on React routes and is copied into `dist` by Vite.
 
-- [Architecture](architecture.md) — providers, API layer, route loading, screen data flow, and UI system
-- [Developer guide](developer.md) — local workflow, tests, CI, API conventions, and visual QA
-- [Agent guide](agent.md) — repository invariants and change checklist
-- [Dashboard API map](docs/api-map.md) — exact live endpoints, query parameters, scopes, and fallbacks
-- [Implementation status](docs/implementation-status.md) — backlog coverage and truthful capability boundaries
-- [Changelog](changelogs.md) — dated implementation history
+### Automatic GitHub deployment
 
-Run `npm run docs:context` after changing canonical documentation or the inventoried implementation. CI runs `npm run docs:check` against the generated `docs/llm-context.md`.
+Every push or PR merge to `main` runs **Dashboard CI and Azure deployment**.
+Lint, type checks, unit tests, build, documentation freshness and Chromium E2E
+must pass before the checked `dist` artifact is deployed. Pull requests run
+checks only. The workflow can also be run manually on `main` from **Actions**.
+
+The workflow uses the repository secret `AZURE_STATIC_WEB_APPS_API_TOKEN`.
+Only one deployment runs at a time.
+
+**CI result notifications** posts every completed CI run (success, failure or
+cancellation) to the repository's CI results issue and mentions contributors
+and collaborators. GitHub inbox/email delivery follows each user's notification
+preferences; mentions cannot override muted notifications. Recipients are
+discovered from contributors and collaborators, with `CI_NOTIFICATION_USERS`
+as a fallback collaborator list. `CI_NOTIFICATION_ISSUE` selects the results
+issue. Keep these repository variables current if collaborators change and
+the workflow token cannot enumerate them.
+
+### Local deployment
+
+After signing in with `az login`, you can also redeploy locally:
+
+```bash
+npm run build
+SWA_CLI_DEPLOYMENT_TOKEN="$(az staticwebapp secrets list \
+  --subscription 8406cce0-3a67-4d8e-b536-965b930989af \
+  --resource-group paiziq-dev --name paiziq-dashboard-dev \
+  --query properties.apiKey --output tsv)" \
+  npx -y @azure/static-web-apps-cli@2.0.10 deploy ./dist --env production --no-use-keychain
+```
+
+## Routes
 
 ## Design system
 
@@ -195,15 +226,7 @@ The visual reference remains `/Users/chavz/Downloads/Payment Agent Audit Layer.h
 
 The route UI does not use MUI. Reuse primitives in `src/app/components/primitives`, live API functions in `src/app/api`, and semantic tokens in `src/styles/theme.css` before adding another dependency or local abstraction.
 
-## Important limitations
-
-- The API key is stored in tab-scoped `sessionStorage`, not an HttpOnly cookie. Use the dashboard only on trusted devices and origins.
-- Database-managed reviewer identities are bound to the API-key name, environment, and role. Bootstrap admin keys have no managed reviewer identity, so their acting-reviewer label remains operator-entered metadata rather than a user account.
-- The login probe validates a key but does not prove that it has read access to every dashboard resource.
-- Numeric risk scores are not part of the v1 metrics contract; the overview shows exact counts for recorded `risk_flags`.
-- Agent responses do not include last-seen, SDK-error, latency, or health metrics.
-- Webhook deliveries are scoped by the selected environment; the legacy notification feed is global because its raw contract has no environment field.
-- Webhook-endpoint management, retention execution, organization/environment creation, and organization preference editing are backend capabilities not exposed by current dashboard screens.
+The active dashboard no longer imports MUI page components. MUI, Emotion, and Recharts may still appear in `package.json` because the original Figma bundle included them and local shadcn files may still reference Recharts in unused utilities. Remove package dependencies only after confirming no current or planned screens import them.
 
 ### agent.md
 
@@ -478,6 +501,15 @@ This is local MockGateway coverage; the service lane is separate from fixture CI
 1. The `quality` job uses Node `22.22`, runs `npm ci`, then `npm run check`.
 2. The dependent `e2e` job installs Playwright Chromium with system dependencies, then runs `npm run test:e2e`.
 
+3. On `main` pushes and manual runs, `deploy` publishes the exact checked build
+   artifact to the existing Azure Static Web App after both jobs pass. PRs do
+   not deploy. Concurrency queues runs instead of cancelling deployments.
+
+The separate `.github/workflows/notify-ci.yml` runs after CI finishes, including
+failed checks. It mentions all discovered contributors and collaborators in
+the CI results issue (`CI_NOTIFICATION_ISSUE`); `CI_NOTIFICATION_USERS` supplies
+a fallback collaborator list. GitHub notification preferences still apply.
+
 The E2E job is intentionally separate from `npm run check`, which keeps the local quality loop independent of a browser installation.
 
 ## Adding or changing a live screen
@@ -556,6 +588,10 @@ Also verify:
 # Changelogs
 
 ## 2026-10-03
+
+- Made `main` and `dev` use the development tree, retaining branch ancestry without importing main-only files.
+- Added automatic Azure deployment on pushes/merges to `main`, gated by the quality and Chromium workflow checks, using the checked production artifact. Pull requests remain checks-only; manual main deployment remains available.
+- Added success/failure/cancellation notifications to a GitHub CI results thread with contributor and collaborator mentions; delivery respects each user's GitHub notification settings.
 
 - Added two payment-agent fixture workflows and one live service workflow covering SDK decisions, all payment states, threshold reasons, policy version, correlated trace events, the open review queue, and live policy simulation.
 - Added `test:e2e:service` with a fresh temporary backend database, owned servers, strict ports, and optional `PAIZIQ_DEMO_DIR` screenshot/JSON capture. The service configuration is included in TypeScript checking.

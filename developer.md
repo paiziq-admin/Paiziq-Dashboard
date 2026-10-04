@@ -66,6 +66,15 @@ This is local MockGateway coverage; the service lane is separate from fixture CI
 1. The `quality` job uses Node `22.22`, runs `npm ci`, then `npm run check`.
 2. The dependent `e2e` job installs Playwright Chromium with system dependencies, then runs `npm run test:e2e`.
 
+3. On `main` pushes and manual runs, `deploy` publishes the exact checked build
+   artifact to the existing Azure Static Web App after both jobs pass. PRs do
+   not deploy. Concurrency queues runs instead of cancelling deployments.
+
+The separate `.github/workflows/notify-ci.yml` runs after CI finishes, including
+failed checks. It mentions all discovered contributors and collaborators in
+the CI results issue (`CI_NOTIFICATION_ISSUE`); `CI_NOTIFICATION_USERS` supplies
+a fallback collaborator list. GitHub notification preferences still apply.
+
 The E2E job is intentionally separate from `npm run check`, which keeps the local quality loop independent of a browser installation.
 
 ## Adding or changing a live screen

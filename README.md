@@ -59,20 +59,28 @@ npm run test:e2e:service
 
 The development dashboard is hosted at https://brave-river-0a6dd1310.5.azurestaticapps.net
 using Azure Static Web Apps (Free), in resource group `paiziq-dev`, Central US.
-It currently displays mock data. Deployment uploads the `dist` build without a
+It connects to the live backend through the login screen. Deployment uploads the `dist` build without a
 server. `public/staticwebapp.config.json` enables direct links
 and refreshes on React routes and is copied into `dist` by Vite.
 
-### Manual GitHub deployment
+### Automatic GitHub deployment
 
-Push your changes, then open the repository's **Actions** tab, select
-**Deploy dashboard to Azure**, click **Run workflow**, choose the branch containing
-your changes (normally `main`), and click **Run workflow** again. The selected
-branch is built and deployed to the existing live development dashboard.
-Pushes and pull requests do not trigger deployment.
+Every push or PR merge to `main` runs **Dashboard CI and Azure deployment**.
+Lint, type checks, unit tests, build, documentation freshness and Chromium E2E
+must pass before the checked `dist` artifact is deployed. Pull requests run
+checks only. The workflow can also be run manually on `main` from **Actions**.
 
 The workflow uses the repository secret `AZURE_STATIC_WEB_APPS_API_TOKEN`.
 Only one deployment runs at a time.
+
+**CI result notifications** posts every completed CI run (success, failure or
+cancellation) to the repository's CI results issue and mentions contributors
+and collaborators. GitHub inbox/email delivery follows each user's notification
+preferences; mentions cannot override muted notifications. Recipients are
+discovered from contributors and collaborators, with `CI_NOTIFICATION_USERS`
+as a fallback collaborator list. `CI_NOTIFICATION_ISSUE` selects the results
+issue. Keep these repository variables current if collaborators change and
+the workflow token cannot enumerate them.
 
 ### Local deployment
 

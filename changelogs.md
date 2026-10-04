@@ -2,6 +2,10 @@
 
 ## 2026-10-03
 
+- Made `main` and `dev` use the development tree, retaining branch ancestry without importing main-only files.
+- Added automatic Azure deployment on pushes/merges to `main`, gated by the quality and Chromium workflow checks, using the checked production artifact. Pull requests remain checks-only; manual main deployment remains available.
+- Added success/failure/cancellation notifications to a GitHub CI results thread with contributor and collaborator mentions; delivery respects each user's GitHub notification settings.
+
 - Added two payment-agent fixture workflows and one live service workflow covering SDK decisions, all payment states, threshold reasons, policy version, correlated trace events, the open review queue, and live policy simulation.
 - Added `test:e2e:service` with a fresh temporary backend database, owned servers, strict ports, and optional `PAIZIQ_DEMO_DIR` screenshot/JSON capture. The service configuration is included in TypeScript checking.
 - Captured a nine-screen tutorial against the live local backend. Run instructions and capability boundaries are documented in the backend `docs/e2e/` plan, audit, and tutorial.

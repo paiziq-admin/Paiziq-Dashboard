@@ -1,16 +1,22 @@
-name: Dashboard CI
+name: Dashboard CI and Azure deployment
 
 on:
   pull_request:
   push:
     branches: ["main"]
+  workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: dashboard-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   quality:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -19,10 +25,18 @@ jobs:
           node-version: "22.22"
       - run: npm ci
       - run: npm run check
+      - name: Save checked production build
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: dashboard-dist
+          path: dist
+          include-hidden-files: true
+          retention-days: 3
 
   e2e:
     needs: quality
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -32,3 +46,25 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
+
+  deploy:
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: [quality, e2e]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Download checked production build
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: dashboard-dist
+          path: dist
+      - name: Publish dashboard
+        uses: Azure/static-web-apps-deploy@4d27395796ac319302594769cfe812bd207490b1 # v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          action: upload
+          app_location: dist
+          output_location: ''
+          skip_app_build: true
+          skip_api_build: true
+          production_branch: main
