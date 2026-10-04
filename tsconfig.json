@@ -25,6 +25,7 @@
     "e2e",
     "eslint.config.js",
     "playwright.config.ts",
+    "playwright.service.config.ts",
     "vite.config.ts",
     "vitest.config.ts"
   ],

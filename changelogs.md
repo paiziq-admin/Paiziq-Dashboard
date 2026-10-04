@@ -1,5 +1,11 @@
 # Changelogs
 
+## 2026-10-03
+
+- Added two payment-agent fixture workflows and one live service workflow covering SDK decisions, all payment states, threshold reasons, policy version, correlated trace events, the open review queue, and live policy simulation.
+- Added `test:e2e:service` with a fresh temporary backend database, owned servers, strict ports, and optional `PAIZIQ_DEMO_DIR` screenshot/JSON capture. The service configuration is included in TypeScript checking.
+- Captured a nine-screen tutorial against the live local backend. Run instructions and capability boundaries are documented in the backend `docs/e2e/` plan, audit, and tutorial.
+
 ## 2026-07-26
 
 - Replaced active screen fixture coupling with an authenticated, typed API layer for organizations, metrics, payments, decisions, traces, reviews, policies, agents, API keys, audit records, notifications, search, and webhook deliveries (PZ-046).

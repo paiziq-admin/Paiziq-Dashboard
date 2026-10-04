@@ -52,6 +52,7 @@ npm run build
 npm run docs:check
 npm run check
 npm run test:e2e
+npm run test:e2e:service
 ```
 
 `npm run check` runs lint, typecheck, unit/component tests, the production build, and the generated-document freshness check. Playwright E2E is separate and is configured in CI after the quality job. These are available gates, not a claim that an arbitrary checkout or backend is currently passing.

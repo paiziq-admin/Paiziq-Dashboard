@@ -26,7 +26,8 @@ The UI runtime is pinned to React `19.2.8` and React Router `8.3.0`. Runtime dep
 | `npm run typecheck` | Run strict TypeScript checking without emitting files |
 | `npm run test` | Run Vitest once in jsdom |
 | `npm run test:watch` | Run Vitest interactively |
-| `npm run test:e2e` | Run Playwright's Chromium project |
+| `npm run test:e2e` | Run the six fixture Chromium workflows |
+| `npm run test:e2e:service` | Start isolated ingest + Vite and run the live SDK workflow |
 | `npm run docs:context` | Regenerate `docs/llm-context.md` |
 | `npm run docs:check` | Fail if the generated LLM context is stale |
 | `npm run check` | Run lint, typecheck, unit tests, build, and docs freshness in sequence |
@@ -41,6 +42,22 @@ npm run test:e2e
 ```
 
 The checked-in E2E suite intercepts the Paiziq API with a deterministic contract fixture. It covers every route, mobile containment for payment/review screens, reviewer note/claim/approve behavior, and policy edit/save/publish behavior. It validates browser workflow wiring; it is not a substitute for backend integration or deployment smoke testing.
+
+## Live payment-agent workflow
+
+Use the paired backend checkout at `../paiziq_backend/files/paiziq`, or set
+`PAIZIQ_BACKEND_DIR` to its absolute path. Prepare it with `make venv`,
+`make install`, and `make ingest-install`. Stop manual servers on ports 8800
+and 4173, then run `npm run test:e2e:service`. This command creates a temporary
+SQLite database and owns both servers; it never clears the manual demo database.
+
+The single service test seeds the SDK's approved/executed, needs-review, and
+rejected scenarios, signs in, selects the run's environment, verifies the exact
+trace correlation, and checks the review queue and published policy simulation.
+Set `PAIZIQ_DEMO_DIR=/absolute/output/path` to capture nine screenshots plus
+`workflow.json`. The backend `docs/e2e/PAYMENT_AGENT_WORKFLOW_TUTORIAL.md` contains
+the complete reproducible guide, with plan/audit evidence alongside it.
+This is local MockGateway coverage; the service lane is separate from fixture CI.
 
 ## CI
 

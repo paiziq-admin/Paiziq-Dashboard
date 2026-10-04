@@ -16,6 +16,7 @@
   "preview": "vite preview",
   "test": "vitest run",
   "test:e2e": "playwright test",
+  "test:e2e:service": "playwright test --config playwright.service.config.ts",
   "test:watch": "vitest",
   "typecheck": "tsc --noEmit"
 }
@@ -23,13 +24,16 @@
 
 ## Implementation inventory
 
-Source digest: `eb6f284ae387a87ab171774b3f6dd7d4806dee2724019119f4afbb73f2582672`
+Source digest: `c3a33eeb3746032eab72abf1f668a2c21e8c128a5aaf60854398359a1eaa3610`
 
 - `.github/workflows/ci.yml`
 - `.gitignore`
 - `e2e/dashboard.spec.ts`
+- `e2e/fixture/payment-agent-workflow.fixture.e2e.spec.ts`
 - `e2e/review-policy.spec.ts`
+- `e2e/service/payment-agent-workflow.service.e2e.spec.ts`
 - `e2e/support/mockApi.ts`
+- `e2e/support/paymentAgentFixtures.ts`
 - `eslint.config.js`
 - `index.html`
 - `package-lock.json`
@@ -163,6 +167,7 @@ npm run build
 npm run docs:check
 npm run check
 npm run test:e2e
+npm run test:e2e:service
 ```
 
 `npm run check` runs lint, typecheck, unit/component tests, the production build, and the generated-document freshness check. Playwright E2E is separate and is configured in CI after the quality job. These are available gates, not a claim that an arbitrary checkout or backend is currently passing.
@@ -433,7 +438,8 @@ The UI runtime is pinned to React `19.2.8` and React Router `8.3.0`. Runtime dep
 | `npm run typecheck` | Run strict TypeScript checking without emitting files |
 | `npm run test` | Run Vitest once in jsdom |
 | `npm run test:watch` | Run Vitest interactively |
-| `npm run test:e2e` | Run Playwright's Chromium project |
+| `npm run test:e2e` | Run the six fixture Chromium workflows |
+| `npm run test:e2e:service` | Start isolated ingest + Vite and run the live SDK workflow |
 | `npm run docs:context` | Regenerate `docs/llm-context.md` |
 | `npm run docs:check` | Fail if the generated LLM context is stale |
 | `npm run check` | Run lint, typecheck, unit tests, build, and docs freshness in sequence |
@@ -448,6 +454,22 @@ npm run test:e2e
 ```
 
 The checked-in E2E suite intercepts the Paiziq API with a deterministic contract fixture. It covers every route, mobile containment for payment/review screens, reviewer note/claim/approve behavior, and policy edit/save/publish behavior. It validates browser workflow wiring; it is not a substitute for backend integration or deployment smoke testing.
+
+## Live payment-agent workflow
+
+Use the paired backend checkout at `../paiziq_backend/files/paiziq`, or set
+`PAIZIQ_BACKEND_DIR` to its absolute path. Prepare it with `make venv`,
+`make install`, and `make ingest-install`. Stop manual servers on ports 8800
+and 4173, then run `npm run test:e2e:service`. This command creates a temporary
+SQLite database and owns both servers; it never clears the manual demo database.
+
+The single service test seeds the SDK's approved/executed, needs-review, and
+rejected scenarios, signs in, selects the run's environment, verifies the exact
+trace correlation, and checks the review queue and published policy simulation.
+Set `PAIZIQ_DEMO_DIR=/absolute/output/path` to capture nine screenshots plus
+`workflow.json`. The backend `docs/e2e/PAYMENT_AGENT_WORKFLOW_TUTORIAL.md` contains
+the complete reproducible guide, with plan/audit evidence alongside it.
+This is local MockGateway coverage; the service lane is separate from fixture CI.
 
 ## CI
 
@@ -532,6 +554,12 @@ Also verify:
 ### changelogs.md
 
 # Changelogs
+
+## 2026-10-03
+
+- Added two payment-agent fixture workflows and one live service workflow covering SDK decisions, all payment states, threshold reasons, policy version, correlated trace events, the open review queue, and live policy simulation.
+- Added `test:e2e:service` with a fresh temporary backend database, owned servers, strict ports, and optional `PAIZIQ_DEMO_DIR` screenshot/JSON capture. The service configuration is included in TypeScript checking.
+- Captured a nine-screen tutorial against the live local backend. Run instructions and capability boundaries are documented in the backend `docs/e2e/` plan, audit, and tutorial.
 
 ## 2026-07-26
 
@@ -760,7 +788,7 @@ These are intentional disclosures, not mock-data gaps:
 - Agent last-seen, SDK errors, latency, and health are absent from the backend response.
 - Alerts scope webhook deliveries to the selected environment; legacy notifications remain global because that raw response has no environment field.
 - Settings currently covers API-key lifecycle only; webhook endpoint and retention controls are not wired.
-- Browser E2E uses an intercepted contract fixture; live backend/deployment integration remains a separate verification concern.
+- Browser E2E has six fixture workflows plus a separately invoked local service workflow using the real SDK/ingest and MockGateway. Production deployment and real payment settlement remain outside this coverage.
 
 ## Evidence and verification
 
@@ -794,3 +822,7 @@ Current-worktree evidence recorded on 2026-07-26:
 - `npm run docs:check`: passed after regenerating the LLM context from the final source and canonical documentation.
 
 Record future command results in the delivery/PR notes; do not convert “configured” to “passing” without a current run.
+
+## Payment-agent workflow evidence — 2026-10-03
+
+The service lane was executed successfully against an isolated SQLite backend on Node 24.19.0: all three payment states, exact request/trace correlation, open review, published policy version 1, and a non-persisting policy simulation. Tutorial captures come from that run. The backend plan, endpoint report, and audit are in its `docs/e2e/` directory.

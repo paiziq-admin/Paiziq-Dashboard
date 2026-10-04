@@ -52,7 +52,7 @@ These are intentional disclosures, not mock-data gaps:
 - Agent last-seen, SDK errors, latency, and health are absent from the backend response.
 - Alerts scope webhook deliveries to the selected environment; legacy notifications remain global because that raw response has no environment field.
 - Settings currently covers API-key lifecycle only; webhook endpoint and retention controls are not wired.
-- Browser E2E uses an intercepted contract fixture; live backend/deployment integration remains a separate verification concern.
+- Browser E2E has six fixture workflows plus a separately invoked local service workflow using the real SDK/ingest and MockGateway. Production deployment and real payment settlement remain outside this coverage.
 
 ## Evidence and verification
 
@@ -86,3 +86,7 @@ Current-worktree evidence recorded on 2026-07-26:
 - `npm run docs:check`: passed after regenerating the LLM context from the final source and canonical documentation.
 
 Record future command results in the delivery/PR notes; do not convert “configured” to “passing” without a current run.
+
+## Payment-agent workflow evidence — 2026-10-03
+
+The service lane was executed successfully against an isolated SQLite backend on Node 24.19.0: all three payment states, exact request/trace correlation, open review, published policy version 1, and a non-persisting policy simulation. Tutorial captures come from that run. The backend plan, endpoint report, and audit are in its `docs/e2e/` directory.

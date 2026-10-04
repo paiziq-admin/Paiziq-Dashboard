@@ -16,6 +16,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:e2e": "playwright test",
+    "test:e2e:service": "playwright test --config playwright.service.config.ts",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit"
   },
