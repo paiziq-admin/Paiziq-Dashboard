@@ -67,7 +67,9 @@ and refreshes on React routes and is copied into `dist` by Vite.
 
 Every push or PR merge to `main` runs **Dashboard CI and Azure deployment**.
 Lint, type checks, unit tests, build, documentation freshness and Chromium E2E
-must pass before the checked `dist` artifact is deployed. Pull requests run
+must pass before the checked `dist` artifact is deployed. After uploading, CI
+requires the hosted root and login route to respond successfully and verifies
+that the served JavaScript/CSS matches the checked build. Pull requests run
 checks only. The workflow can also be run manually on `main` from **Actions**.
 
 The workflow uses the repository secret `AZURE_STATIC_WEB_APPS_API_TOKEN`.
@@ -109,9 +111,6 @@ The visual reference remains `/Users/chavz/Downloads/Payment Agent Audit Layer.h
 
 The route UI does not use MUI. Reuse primitives in `src/app/components/primitives`, live API functions in `src/app/api`, and semantic tokens in `src/styles/theme.css` before adding another dependency or local abstraction.
 
-<<<<<<< Updated upstream
-The active dashboard no longer imports MUI page components. MUI, Emotion, and Recharts may still appear in `package.json` because the original Figma bundle included them and local shadcn files may still reference Recharts in unused utilities. Remove package dependencies only after confirming no current or planned screens import them.
-=======
 ## Important limitations
 
 - The API key is stored in tab-scoped `sessionStorage`, not an HttpOnly cookie. Use the dashboard only on trusted devices and origins.
@@ -122,4 +121,3 @@ The active dashboard no longer imports MUI page components. MUI, Emotion, and Re
 - Agent responses do not include last-seen, SDK-error, latency, or health metrics.
 - Webhook deliveries are scoped by the selected environment; the legacy notification feed is global because its raw contract has no environment field.
 - Webhook-endpoint management, retention execution, organization/environment creation, and organization preference editing are backend capabilities not exposed by current dashboard screens.
->>>>>>> Stashed changes

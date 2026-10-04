@@ -2,6 +2,8 @@
 
 ## 2026-10-04
 
+- Added a post-deployment gate for the hosted root/login routes and exact checked JavaScript/CSS assets. Azure accepting an upload no longer establishes CI deployment success when the served site is unavailable or stale. Removed leftover README conflict markers while retaining the current capability limitations.
+
 - Regenerated the documentation snapshot after the Phase 0 merge to restore the dashboard CI freshness gate. Live Azure verification remains blocked: the subscription reports `Warned`, backend compute is suspended, and the dashboard hostname currently returns Azure HTTP 404.
 
 - Added the Phase 0 execution-evidence panel with read-only execution state, exact scoped spend/reservations, immutable request/policy snapshots and digests, and execution event history. JSON uses the existing secret redaction before display or copy.
