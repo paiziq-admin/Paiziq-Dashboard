@@ -24,15 +24,21 @@
 
 ## Implementation inventory
 
+<<<<<<< Updated upstream
 Source digest: `56af9efc24e529b3a86dfce13d402a01406a80122f35e049e2f739e1bd2242f6`
+=======
+Source digest: `dfbfb7aab86e0d8deb7e4458c317e9943d1236e9d87a9bc5cee931718634de1a`
+>>>>>>> Stashed changes
 
 - `.github/workflows/ci.yml`
 - `.github/workflows/notify-ci.yml`
 - `.gitignore`
 - `e2e/dashboard.spec.ts`
+- `e2e/fixture/execution-evidence.fixture.e2e.spec.ts`
 - `e2e/fixture/payment-agent-workflow.fixture.e2e.spec.ts`
 - `e2e/review-policy.spec.ts`
 - `e2e/service/payment-agent-workflow.service.e2e.spec.ts`
+- `e2e/service/phase0-execution.service.e2e.spec.ts`
 - `e2e/support/mockApi.ts`
 - `e2e/support/paymentAgentFixtures.ts`
 - `eslint.config.js`
@@ -81,6 +87,8 @@ Source digest: `56af9efc24e529b3a86dfce13d402a01406a80122f35e049e2f739e1bd2242f6
 - `src/app/components/screens/alerts/AlertsScreen.tsx`
 - `src/app/components/screens/audit/AuditScreen.tsx`
 - `src/app/components/screens/overview/OverviewScreen.tsx`
+- `src/app/components/screens/payments/ExecutionEvidencePanel.test.tsx`
+- `src/app/components/screens/payments/ExecutionEvidencePanel.tsx`
 - `src/app/components/screens/payments/PaymentDetailScreen.tsx`
 - `src/app/components/screens/payments/PaymentFeedScreen.tsx`
 - `src/app/components/screens/payments/TraceJsonViewer.tsx`
@@ -106,6 +114,7 @@ Source digest: `56af9efc24e529b3a86dfce13d402a01406a80122f35e049e2f739e1bd2242f6
 - `src/styles/index.css`
 - `src/styles/tailwind.css`
 - `src/styles/theme.css`
+- `src/test/fixtures/executionEvidence.ts`
 - `src/test/setup.ts`
 - `tsconfig.json`
 - `vite.config.ts`
@@ -147,7 +156,7 @@ Demo mode stores no endpoint or key. Primary live-data screens render explicit c
 | `/login` | Live backend/API-key connection or data-free demo mode |
 | `/` | Live summary metrics, `payments.total` volume, decision/risk-flag charts, and recent payments |
 | `/payments` | Exact server-filtered/sorted pagination, saved views, and 30-second refresh |
-| `/payments/:id` | Payment transitions, decisions, correlated trace JSON, and exact payment webhook attempts |
+| `/payments/:id` | Payment decisions, authoritative execution/reservation evidence, immutable snapshots, correlated trace JSON, and exact payment webhook attempts |
 | `/reviews` | PZ-101 review queue, authenticated reviewer identity, assignment, actions, priority, and SLA state |
 | `/policies` | Reason-audited draft editing, allow/block lists, publish, rollback, versions, unsaved-draft diff, and simulation |
 | `/agents` | Agent inventory, metadata, filtering, and enable/disable |
@@ -226,7 +235,20 @@ The visual reference remains `/Users/chavz/Downloads/Payment Agent Audit Layer.h
 
 The route UI does not use MUI. Reuse primitives in `src/app/components/primitives`, live API functions in `src/app/api`, and semantic tokens in `src/styles/theme.css` before adding another dependency or local abstraction.
 
+<<<<<<< Updated upstream
 The active dashboard no longer imports MUI page components. MUI, Emotion, and Recharts may still appear in `package.json` because the original Figma bundle included them and local shadcn files may still reference Recharts in unused utilities. Remove package dependencies only after confirming no current or planned screens import them.
+=======
+## Important limitations
+
+- The API key is stored in tab-scoped `sessionStorage`, not an HttpOnly cookie. Use the dashboard only on trusted devices and origins.
+- Database-managed reviewer identities are bound to the API-key name, environment, and role. Bootstrap admin keys have no managed reviewer identity, so their acting-reviewer label remains operator-entered metadata rather than a user account.
+- The login probe validates a key but does not prove that it has read access to every dashboard resource.
+- Execution confirmation records an executor-reported provider result; the dashboard does not contact providers or offer execution/retry/reconciliation controls. Historical terminal states without managed claims remain unverified.
+- Numeric risk scores are not part of the v1 metrics contract; the overview shows exact counts for recorded `risk_flags`.
+- Agent responses do not include last-seen, SDK-error, latency, or health metrics.
+- Webhook deliveries are scoped by the selected environment; the legacy notification feed is global because its raw contract has no environment field.
+- Webhook-endpoint management, retention execution, organization/environment creation, and organization preference editing are backend capabilities not exposed by current dashboard screens.
+>>>>>>> Stashed changes
 
 ### agent.md
 
@@ -378,7 +400,7 @@ See `docs/api-map.md` for the exact paths, query strings, request bodies, and re
 | --- | --- |
 | Overview | Summary plus one `payments.total` timeseries; `risk_flags`; newest eight payments via `created_desc` |
 | Payment feed | Server-side environment/agent/state/currency/amount/text/time filters, sort, exact total, and pagination |
-| Payment detail | Primary payment first; decisions, trace correlation, and exact paginated `env_id` + `payment_id` webhook lookup settle independently |
+| Payment detail | Primary payment first; decisions, trace correlation, and exact paginated `env_id` + `payment_id` webhook lookup settle independently; execution evidence has its own loading/error/refresh state and preserves exact scoped ledger decimals |
 | Reviews | Open PZ-101 queue/detail and `GET /v1/reviews/identity`; role/tenant/identity-bound actions; 404-only older-server fallback |
 | Policies | Environment policy list, detail/version history, reason-audited draft saves, publish/rollback, local unsaved-draft diff, and inline unsaved-draft simulation |
 | Agents | Environment inventory and status patches through the backend's generic authenticated-key dependency |
@@ -461,7 +483,7 @@ The UI runtime is pinned to React `19.2.8` and React Router `8.3.0`. Runtime dep
 | `npm run typecheck` | Run strict TypeScript checking without emitting files |
 | `npm run test` | Run Vitest once in jsdom |
 | `npm run test:watch` | Run Vitest interactively |
-| `npm run test:e2e` | Run the six fixture Chromium workflows |
+| `npm run test:e2e` | Run the fixture Chromium workflows |
 | `npm run test:e2e:service` | Start isolated ingest + Vite and run the live SDK workflow |
 | `npm run docs:context` | Regenerate `docs/llm-context.md` |
 | `npm run docs:check` | Fail if the generated LLM context is stale |
@@ -486,13 +508,13 @@ Use the paired backend checkout at `../paiziq_backend/files/paiziq`, or set
 and 4173, then run `npm run test:e2e:service`. This command creates a temporary
 SQLite database and owns both servers; it never clears the manual demo database.
 
-The single service test seeds the SDK's approved/executed, needs-review, and
+The payment-agent service test seeds the SDK's approved/executed, needs-review, and
 rejected scenarios, signs in, selects the run's environment, verifies the exact
 trace correlation, and checks the review queue and published policy simulation.
 Set `PAIZIQ_DEMO_DIR=/absolute/output/path` to capture nine screenshots plus
 `workflow.json`. The backend `docs/e2e/PAYMENT_AGENT_WORKFLOW_TUTORIAL.md` contains
 the complete reproducible guide, with plan/audit evidence alongside it.
-This is local MockGateway coverage; the service lane is separate from fixture CI.
+A second service test runs `make phase0-demo` and follows real SDK hosted execution evidence into the dashboard. It checks one confirmed provider call across duplicate requests, held unknown funds, and a blocked budget. It uses only local mock providers. `PAIZIQ_DEMO_DIR` also captures `phase0-unknown-execution.png` and `phase0-workflow.json`. The service lane is separate from fixture CI.
 
 ## CI
 
@@ -587,6 +609,13 @@ Also verify:
 
 # Changelogs
 
+## 2026-10-04
+
+- Added the Phase 0 execution-evidence panel with read-only execution state, exact scoped spend/reservations, immutable request/policy snapshots and digests, and execution event history. JSON uses the existing secret redaction before display or copy.
+- Separated execution evidence from payment approval and legacy terminal reports. Unknown provider results retain a visible no-retry instruction. Removed manual “Mark executed” and “Mark failed” controls.
+- Added authenticated evidence reads, partial loading/error/404/403/429 states, explicit evidence refresh, stale-response isolation, API/component coverage, and responsive light/dark browser checks. Added the frontend Phase 0 tracker in implementation status. Large event payloads mount only when opened; truncated event windows show the total count.
+- Verified `npm run check` (24 tests plus lint/typecheck/build/docs), all eight fixture browser workflows, and both real-service browser workflows. The Phase 0 service workflow uses the SDK hosted ledger and mock providers, with captured evidence under `docs/phase0-evidence/`.
+
 ## 2026-10-03
 
 - Made `main` and `dev` use the development tree, retaining branch ancestry without importing main-only files.
@@ -671,16 +700,21 @@ The login stores the normalized endpoint and API key in tab-scoped `sessionStora
 | Payment feed | `GET /v1/payments` | `env_id`; optional `agent_id`, `state`, `currency`, `min_amount`, `max_amount`, `q`; global `from_ms`/`to_ms`; `sort`; `limit`, `offset` |
 | Feed agent names | `GET /v1/agents` | `env_id`, `limit=200`, `offset=0` |
 | Payment detail | `GET /v1/payments/{payment_id}` | path `payment_id` |
+| Execution evidence | `GET /v1/payments/{payment_id}/execution` | path `payment_id`; read role and payment environment enforced by service |
 | Payment decisions | `GET /v1/decisions` | `payment_id`, `limit=200`, `offset=0` |
 | Direct trace lookup | `GET /v1/traces/{trace_id}` | tries payment `request_id`, then payment ID |
 | Trace correlation fallback | `GET /v1/search/events` | quoted `q`, `limit=10`, `offset=0`; returned trace IDs are fetched through `/v1/traces/{trace_id}` |
 | Related webhook deliveries | `GET /v1/webhook-deliveries` | exact `env_id` + `payment_id`, `limit=200`, increasing `offset` until `meta.total` is exhausted |
 | Delivery attempts | `GET /v1/webhook-deliveries/{delivery_id}` | every correlated delivery, loaded in concurrency batches of 20 |
-| Manual payment transition | `POST /v1/payments/{payment_id}/transition` | `{"to": "approved" | "needs_review" | "rejected" | "executed" | "failed", "reason": string}`; the dashboard requires a reason |
+| Manual payment transition | `POST /v1/payments/{payment_id}/transition` | `{"to": "approved" | "needs_review" | "rejected", "reason": string}`; the dashboard requires a reason |
 
 All payment-feed filters and sorting are server-side. `sort` is one of `created_desc`, `created_asc`, `amount_desc`, `amount_asc`, or `merchant_asc`; currency and amount ranges are exact, time bounds are inclusive epoch milliseconds, and `q` searches the payment ID, agent ID, principal ID, merchant, request ID, and intent text. `meta.total` is the total after those filters, so page boundaries are exact. If a filter makes the requested page invalid, the dashboard clamps to the last page and refetches that offset. Saved views are browser-local. The feed refetches every 30 seconds in live mode.
 
 The overview reads `payment_total` from the normalized summary payment-state counts and plots the summary's `risk_flags` map. It does not substitute verdict counts for risk flags.
+
+The execution-evidence endpoint returns the service authority, a nullable execution claim, its reservation, exact decimal strings for rolling 24-hour/30-day committed spend, and all unresolved reservations scoped by organization, environment, agent, and currency. Immutable request/policy snapshots and digests freeze at the execution claim; events preserve the recorded actor and timestamp. The API returns up to the latest 1,000 events in chronological order, with `events_total`, `events_limit`, and `events_truncated`; the UI labels an incomplete window. Budget limits show the current policy, while the immutable snapshot preserves the execution policy. `confirmed` means the executor recorded a successful provider result. This read API does not independently contact the provider.
+
+A 200 response with no claim is distinct from unavailable evidence. A legacy `executed` or `failed` payment without a claim is visibly unverified. A 404 does not prove no execution occurred; older servers may not support the endpoint. Unknown and in-progress results direct the operator to retain the original request and avoid a second charge. The dashboard has no execution, retry, reconciliation, or terminal-state mutation control. Refresh evidence repeats only the GET request. The evidence scope follows the payment, not the global time-range selector. The separate webhook section still reports delivery attempts; delivery success is not payment success.
 
 Direct transitions require ingest or admin access. A payment in `needs_review` is deliberately resolved through the Reviews API instead of a detail-page transition.
 
@@ -772,7 +806,23 @@ Do not describe these as Settings features until a route actually wires the corr
 
 # Dashboard Implementation Status
 
-Verified against the active dashboard source and backend PZ-101 review surface on 2026-07-26. “Configured” means the repository contains the command/workflow configuration; it is not a claim that the gate passed in every environment.
+Phase 0 execution evidence verified against the active dashboard and local hosted service on 2026-10-04. The earlier PZ-101 inventory was verified on 2026-07-26. “Configured” means the repository contains the command/workflow configuration; it is not a claim that the gate passed in every environment.
+
+## Phase 0 tracker — execution and evidence foundation
+
+Scope: the execution foundation from the site-artifact parity plan. Scores, economic recommendations, compute usage, and outcomes belong to later phases.
+
+| ID | Owner | Status | To-do / acceptance evidence |
+| --- | --- | --- | --- |
+| P0-FE-01 | Frontend | Complete | Read `/v1/payments/{payment_id}/execution` through the authenticated API layer; preserve exact decimal strings. |
+| P0-FE-02 | Frontend | Complete | Show reserved, in-progress, confirmed, failed, and unknown states; do not infer a charge from approval or a legacy report. |
+| P0-FE-03 | Frontend | Complete | Show organization/environment/agent/currency scope, rolling spend, all unresolved reservations, immutable authorization snapshots and append-only event history. |
+| P0-FE-04 | Frontend | Complete | Remove manual terminal-state buttons. Unknown results direct the operator to reconcile the provider request before retry. |
+| P0-FE-05 | Frontend | Complete | Preserve read-only access, demo mode, loading, missing evidence, older-server 404, 403, 429, refresh, and stale-response isolation; redact evidence JSON. |
+| P0-FE-06 | Frontend | Complete | `npm run check`: 24 unit/API/component tests plus lint, typecheck, build, and docs; `npm run test:e2e`: 8 browser workflows; `npm run test:e2e:service`: 2 live-service workflows. |
+| P0-BE-01 | Backend | See backend tracker | Shared exact ledger, atomic reservations and execution claims, immutable snapshots, provider idempotency/reconciliation, hosted/local authority, and durable business events. [Backend progress tracker](../../paiziq_backend/files/paiziq/docs/05_PROGRESS_TRACKER.md) records backend completion evidence. |
+
+The live service workflow uses a new isolated SQLite database and mock providers. The SDK submits a confirmed request twice with one provider call, retains an unknown request with one provider call and 20 USD reserved, and blocks a new 50 USD request because 40 USD committed plus 20 USD reserved would exceed the 100 USD limit. [Captured execution evidence](phase0-evidence/phase0-unknown-execution.png) and [run report](phase0-evidence/phase0-workflow.json) record the local browser run. The screenshots and viewport assertions cover desktop, tablet, and 320/390px phones in light and dark themes.
 
 ## Backlog coverage
 
@@ -824,7 +874,7 @@ These are intentional disclosures, not mock-data gaps:
 - Agent last-seen, SDK errors, latency, and health are absent from the backend response.
 - Alerts scope webhook deliveries to the selected environment; legacy notifications remain global because that raw response has no environment field.
 - Settings currently covers API-key lifecycle only; webhook endpoint and retention controls are not wired.
-- Browser E2E has six fixture workflows plus a separately invoked local service workflow using the real SDK/ingest and MockGateway. Production deployment and real payment settlement remain outside this coverage.
+- Browser E2E has eight fixture workflows plus two separately invoked local service workflows using the real SDK/ingest and mock providers. Production deployment and real payment settlement remain outside this coverage.
 
 ## Evidence and verification
 

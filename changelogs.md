@@ -1,5 +1,12 @@
 # Changelogs
 
+## 2026-10-04
+
+- Added the Phase 0 execution-evidence panel with read-only execution state, exact scoped spend/reservations, immutable request/policy snapshots and digests, and execution event history. JSON uses the existing secret redaction before display or copy.
+- Separated execution evidence from payment approval and legacy terminal reports. Unknown provider results retain a visible no-retry instruction. Removed manual “Mark executed” and “Mark failed” controls.
+- Added authenticated evidence reads, partial loading/error/404/403/429 states, explicit evidence refresh, stale-response isolation, API/component coverage, and responsive light/dark browser checks. Added the frontend Phase 0 tracker in implementation status. Large event payloads mount only when opened; truncated event windows show the total count.
+- Verified `npm run check` (24 tests plus lint/typecheck/build/docs), all eight fixture browser workflows, and both real-service browser workflows. The Phase 0 service workflow uses the SDK hosted ledger and mock providers, with captured evidence under `docs/phase0-evidence/`.
+
 ## 2026-10-03
 
 - Made `main` and `dev` use the development tree, retaining branch ancestry without importing main-only files.

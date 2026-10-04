@@ -11,7 +11,7 @@ const PII_PATTERNS: Array<{ label: string; pattern: RegExp }> = [
   { label: "ssn", pattern: /\b\d{3}-\d{2}-\d{4}\b/g },
 ];
 
-export function TraceJsonViewer({ value }: { value: unknown }) {
+export function TraceJsonViewer({ value, label = "trace" }: { value: unknown; label?: string }) {
   const { value: safeValue, redactions } = useMemo(() => redact(value), [value]);
   const [query, setQuery] = useState("");
   const [expanded, setExpanded] = useState(true);
@@ -42,7 +42,7 @@ export function TraceJsonViewer({ value }: { value: unknown }) {
     <div className="overflow-hidden rounded-[11px] border border-[var(--border)] bg-[var(--code-bg)] text-[var(--code-text)]">
       <div className="flex flex-wrap items-center gap-[8px] border-b border-white/10 p-[10px]">
         <label className="relative min-w-[180px] flex-1">
-          <span className="sr-only">Search trace JSON</span>
+          <span className="sr-only">Search {label} JSON</span>
           <Search className="pointer-events-none absolute left-[9px] top-1/2 -translate-y-1/2 text-white/45" size={14} />
           <input
             className="mono h-[31px] w-full rounded-[7px] border border-white/10 bg-black/20 pl-[30px] pr-[9px] text-[11.5px] text-white outline-none placeholder:text-white/35 focus:border-[var(--accent)]"
@@ -83,7 +83,7 @@ export function TraceJsonViewer({ value }: { value: unknown }) {
           value={safeValue}
         />
         {query && !(JSON.stringify(safeValue) ?? "").toLowerCase().includes(query.trim().toLowerCase()) ? (
-          <div className="p-[20px] text-center text-white/45">No trace fields match “{query}”.</div>
+          <div className="p-[20px] text-center text-white/45">No {label} fields match “{query}”.</div>
         ) : null}
       </div>
     </div>

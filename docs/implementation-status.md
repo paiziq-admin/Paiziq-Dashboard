@@ -1,6 +1,22 @@
 # Dashboard Implementation Status
 
-Verified against the active dashboard source and backend PZ-101 review surface on 2026-07-26. “Configured” means the repository contains the command/workflow configuration; it is not a claim that the gate passed in every environment.
+Phase 0 execution evidence verified against the active dashboard and local hosted service on 2026-10-04. The earlier PZ-101 inventory was verified on 2026-07-26. “Configured” means the repository contains the command/workflow configuration; it is not a claim that the gate passed in every environment.
+
+## Phase 0 tracker — execution and evidence foundation
+
+Scope: the execution foundation from the site-artifact parity plan. Scores, economic recommendations, compute usage, and outcomes belong to later phases.
+
+| ID | Owner | Status | To-do / acceptance evidence |
+| --- | --- | --- | --- |
+| P0-FE-01 | Frontend | Complete | Read `/v1/payments/{payment_id}/execution` through the authenticated API layer; preserve exact decimal strings. |
+| P0-FE-02 | Frontend | Complete | Show reserved, in-progress, confirmed, failed, and unknown states; do not infer a charge from approval or a legacy report. |
+| P0-FE-03 | Frontend | Complete | Show organization/environment/agent/currency scope, rolling spend, all unresolved reservations, immutable authorization snapshots and append-only event history. |
+| P0-FE-04 | Frontend | Complete | Remove manual terminal-state buttons. Unknown results direct the operator to reconcile the provider request before retry. |
+| P0-FE-05 | Frontend | Complete | Preserve read-only access, demo mode, loading, missing evidence, older-server 404, 403, 429, refresh, and stale-response isolation; redact evidence JSON. |
+| P0-FE-06 | Frontend | Complete | `npm run check`: 24 unit/API/component tests plus lint, typecheck, build, and docs; `npm run test:e2e`: 8 browser workflows; `npm run test:e2e:service`: 2 live-service workflows. |
+| P0-BE-01 | Backend | See backend tracker | Shared exact ledger, atomic reservations and execution claims, immutable snapshots, provider idempotency/reconciliation, hosted/local authority, and durable business events. [Backend progress tracker](../../paiziq_backend/files/paiziq/docs/05_PROGRESS_TRACKER.md) records backend completion evidence. |
+
+The live service workflow uses a new isolated SQLite database and mock providers. The SDK submits a confirmed request twice with one provider call, retains an unknown request with one provider call and 20 USD reserved, and blocks a new 50 USD request because 40 USD committed plus 20 USD reserved would exceed the 100 USD limit. [Captured execution evidence](phase0-evidence/phase0-unknown-execution.png) and [run report](phase0-evidence/phase0-workflow.json) record the local browser run. The screenshots and viewport assertions cover desktop, tablet, and 320/390px phones in light and dark themes.
 
 ## Backlog coverage
 
@@ -52,7 +68,7 @@ These are intentional disclosures, not mock-data gaps:
 - Agent last-seen, SDK errors, latency, and health are absent from the backend response.
 - Alerts scope webhook deliveries to the selected environment; legacy notifications remain global because that raw response has no environment field.
 - Settings currently covers API-key lifecycle only; webhook endpoint and retention controls are not wired.
-- Browser E2E has six fixture workflows plus a separately invoked local service workflow using the real SDK/ingest and MockGateway. Production deployment and real payment settlement remain outside this coverage.
+- Browser E2E has eight fixture workflows plus two separately invoked local service workflows using the real SDK/ingest and mock providers. Production deployment and real payment settlement remain outside this coverage.
 
 ## Evidence and verification
 

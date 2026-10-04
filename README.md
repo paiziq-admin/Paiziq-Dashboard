@@ -30,7 +30,7 @@ Demo mode stores no endpoint or key. Primary live-data screens render explicit c
 | `/login` | Live backend/API-key connection or data-free demo mode |
 | `/` | Live summary metrics, `payments.total` volume, decision/risk-flag charts, and recent payments |
 | `/payments` | Exact server-filtered/sorted pagination, saved views, and 30-second refresh |
-| `/payments/:id` | Payment transitions, decisions, correlated trace JSON, and exact payment webhook attempts |
+| `/payments/:id` | Payment decisions, authoritative execution/reservation evidence, immutable snapshots, correlated trace JSON, and exact payment webhook attempts |
 | `/reviews` | PZ-101 review queue, authenticated reviewer identity, assignment, actions, priority, and SLA state |
 | `/policies` | Reason-audited draft editing, allow/block lists, publish, rollback, versions, unsaved-draft diff, and simulation |
 | `/agents` | Agent inventory, metadata, filtering, and enable/disable |
@@ -109,4 +109,17 @@ The visual reference remains `/Users/chavz/Downloads/Payment Agent Audit Layer.h
 
 The route UI does not use MUI. Reuse primitives in `src/app/components/primitives`, live API functions in `src/app/api`, and semantic tokens in `src/styles/theme.css` before adding another dependency or local abstraction.
 
+<<<<<<< Updated upstream
 The active dashboard no longer imports MUI page components. MUI, Emotion, and Recharts may still appear in `package.json` because the original Figma bundle included them and local shadcn files may still reference Recharts in unused utilities. Remove package dependencies only after confirming no current or planned screens import them.
+=======
+## Important limitations
+
+- The API key is stored in tab-scoped `sessionStorage`, not an HttpOnly cookie. Use the dashboard only on trusted devices and origins.
+- Database-managed reviewer identities are bound to the API-key name, environment, and role. Bootstrap admin keys have no managed reviewer identity, so their acting-reviewer label remains operator-entered metadata rather than a user account.
+- The login probe validates a key but does not prove that it has read access to every dashboard resource.
+- Execution confirmation records an executor-reported provider result; the dashboard does not contact providers or offer execution/retry/reconciliation controls. Historical terminal states without managed claims remain unverified.
+- Numeric risk scores are not part of the v1 metrics contract; the overview shows exact counts for recorded `risk_flags`.
+- Agent responses do not include last-seen, SDK-error, latency, or health metrics.
+- Webhook deliveries are scoped by the selected environment; the legacy notification feed is global because its raw contract has no environment field.
+- Webhook-endpoint management, retention execution, organization/environment creation, and organization preference editing are backend capabilities not exposed by current dashboard screens.
+>>>>>>> Stashed changes
