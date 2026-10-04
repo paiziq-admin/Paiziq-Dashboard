@@ -37,10 +37,10 @@
 
 .app-background {
   background:
-    radial-gradient(900px 600px at 88% -12%, rgba(252, 129, 74, 0.18), transparent 62%),
-    radial-gradient(800px 620px at -8% 108%, rgba(86, 66, 86, 0.20), transparent 62%),
-    radial-gradient(500px 400px at 55% 55%, rgba(191, 191, 191, 0.35), transparent 70%),
-    #e8e8e8;
+    radial-gradient(900px 600px at 88% -12%, var(--app-glow-accent), transparent 62%),
+    radial-gradient(800px 620px at -8% 108%, var(--app-glow-primary), transparent 62%),
+    radial-gradient(500px 400px at 55% 55%, var(--app-glow-neutral), transparent 70%),
+    var(--app-background-base);
 }
 
 .glass-shell {
@@ -115,9 +115,9 @@
 
 .control,
 .control-sm {
-  border: 1px solid rgba(86, 66, 86, 0.16);
-  background: rgba(255, 255, 255, 0.60);
-  color: var(--primary);
+  border: 1px solid var(--input);
+  background: var(--input-background);
+  color: var(--foreground);
   outline: none;
   transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
 }
@@ -188,7 +188,7 @@
 }
 
 .grid-table-row:hover {
-  background: rgba(255, 255, 255, 0.50);
+  background: var(--card);
 }
 
 .grid-table-row-selected {

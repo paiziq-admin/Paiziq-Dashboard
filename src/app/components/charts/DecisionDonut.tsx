@@ -1,22 +1,33 @@
-export function DecisionDonut() {
+interface Distribution {
+  approved: number;
+  needsReview: number;
+  rejected: number;
+}
+
+export function DecisionDonut({ distribution }: { distribution: Distribution }) {
+  const total = distribution.approved + distribution.needsReview + distribution.rejected;
+  const circumference = 2 * Math.PI * 60;
+  const approved = total ? (distribution.approved / total) * circumference : 0;
+  const review = total ? (distribution.needsReview / total) * circumference : 0;
+  const rejected = total ? (distribution.rejected / total) * circumference : 0;
   return (
     <div className="grid h-full min-h-[320px] grid-cols-[minmax(180px,0.95fr)_minmax(150px,1fr)] items-center gap-[22px] max-[760px]:min-h-0 max-[760px]:grid-cols-1">
       <svg aria-label="Decision distribution" className="h-[190px] w-[190px] shrink-0 justify-self-center" role="img" viewBox="0 0 160 160">
         <circle cx="80" cy="80" fill="none" r="60" stroke="rgba(86,66,86,0.08)" strokeWidth="20" />
-        <circle cx="80" cy="80" fill="none" r="60" stroke="#4a8a68" strokeDasharray="296 377" strokeDashoffset="0" strokeWidth="20" transform="rotate(-90 80 80)" />
-        <circle cx="80" cy="80" fill="none" r="60" stroke="#d9973b" strokeDasharray="60.4 377" strokeDashoffset="-296" strokeWidth="20" transform="rotate(-90 80 80)" />
-        <circle cx="80" cy="80" fill="none" r="60" stroke="#c05b47" strokeDasharray="20.7 377" strokeDashoffset="-356.4" strokeWidth="20" transform="rotate(-90 80 80)" />
-        <text fill="#3a2f3c" fontFamily="Hanken Grotesk, sans-serif" fontSize="22" fontWeight="800" textAnchor="middle" x="80" y="76">
-          2,847
+        <circle cx="80" cy="80" fill="none" r="60" stroke="var(--success)" strokeDasharray={`${approved} ${circumference}`} strokeDashoffset="0" strokeWidth="20" transform="rotate(-90 80 80)" />
+        <circle cx="80" cy="80" fill="none" r="60" stroke="var(--warning)" strokeDasharray={`${review} ${circumference}`} strokeDashoffset={-approved} strokeWidth="20" transform="rotate(-90 80 80)" />
+        <circle cx="80" cy="80" fill="none" r="60" stroke="var(--danger)" strokeDasharray={`${rejected} ${circumference}`} strokeDashoffset={-(approved + review)} strokeWidth="20" transform="rotate(-90 80 80)" />
+        <text fill="var(--foreground)" fontFamily="Hanken Grotesk, sans-serif" fontSize="22" fontWeight="800" textAnchor="middle" x="80" y="76">
+          {total.toLocaleString()}
         </text>
         <text fill="#96939b" fontFamily="Hanken Grotesk, sans-serif" fontSize="10" textAnchor="middle" x="80" y="94">
-          attempts
+          decisions
         </text>
       </svg>
       <div className="flex min-w-0 flex-col gap-[10px] text-[13px]">
-        <LegendRow color="#4a8a68" label="Approved" value="2,234" />
-        <LegendRow color="#d9973b" label="Review Required" value="457" />
-        <LegendRow color="#c05b47" label="Blocked" value="156" />
+        <LegendRow color="var(--success)" label="Approved" value={distribution.approved.toLocaleString()} />
+        <LegendRow color="var(--warning)" label="Needs review" value={distribution.needsReview.toLocaleString()} />
+        <LegendRow color="var(--danger)" label="Rejected" value={distribution.rejected.toLocaleString()} />
       </div>
     </div>
   );
@@ -31,4 +42,3 @@ function LegendRow({ color, label, value }: { color: string; label: string; valu
     </div>
   );
 }
-

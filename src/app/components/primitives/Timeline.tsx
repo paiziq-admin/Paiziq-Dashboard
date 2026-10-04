@@ -1,4 +1,9 @@
-import type { TimelineEvent } from "../../data/payments";
+export interface TimelineEvent {
+  event: string;
+  details: string;
+  time: string;
+  state?: "done" | "pending" | "system";
+}
 
 const dotColor = {
   done: "var(--accent)",
@@ -24,4 +29,3 @@ export function Timeline({ events }: { events: TimelineEvent[] }) {
     </div>
   );
 }
-

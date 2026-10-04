@@ -12,7 +12,7 @@ export function ActionButton({ className, variant = "secondary", ...props }: Act
     primary:
       "border-0 bg-[var(--accent)] text-white shadow-[var(--shadow-accent-button)] hover:bg-[var(--accent-hover)]",
     secondary:
-      "border border-[rgba(86,66,86,0.2)] bg-[rgba(255,255,255,0.6)] text-[var(--primary)] hover:bg-[rgba(255,255,255,0.9)]",
+      "border border-[var(--border)] bg-[var(--input-background)] text-[var(--foreground)] hover:bg-[var(--popover)]",
     approve: "border-0 bg-[var(--success)] text-white shadow-[0_6px_16px_rgba(74,138,104,0.30)]",
     reject: "border-0 bg-[var(--danger)] text-white shadow-[0_6px_16px_rgba(192,91,71,0.30)]",
     aubergine: "border-0 bg-[var(--primary)] text-white hover:bg-[var(--primary-dark)]",
@@ -29,4 +29,3 @@ export function ActionButton({ className, variant = "secondary", ...props }: Act
     />
   );
 }
-

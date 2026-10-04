@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
 import { cn } from "../ui/utils";
 
 interface GridTableProps {
@@ -65,6 +65,14 @@ export function GridRow({ columns, children, selected, onClick, className }: Gri
   );
 }
 
-export function GridCell({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={cn("grid-table-cell", className)}>{children}</div>;
+interface GridCellProps extends HTMLAttributes<HTMLDivElement> {
+  children: ReactNode;
+}
+
+export function GridCell({ children, className, ...props }: GridCellProps) {
+  return (
+    <div className={cn("grid-table-cell", className)} {...props}>
+      {children}
+    </div>
+  );
 }

@@ -1,25 +1,58 @@
-# Payment Agent Audit Layer Dashboard
+# Paiziq Payment Agent Audit Dashboard
 
-React/Vite prototype for a fintech risk operations dashboard. The UI monitors payment agents, risk scoring, audit trails, trace inspection, policy configuration, SDK health, alerts, and human-in-the-loop approvals.
+React, TypeScript, and Vite operator dashboard for Paiziq. The application connects to the live control-plane and ingest APIs to inspect payment decisions and traces, operate human reviews, manage policies and API keys, monitor agents, export audit records, and inspect notifications and webhook deliveries.
 
-## Design Source Of Truth
+The active route screens no longer import the legacy files in `src/app/data`. Demo mode is an interface preview without seeded records or backend mutations.
 
-The visual source of truth is `/Users/chavz/Downloads/Payment Agent Audit Layer.html`.
+## Run locally
 
-The app intentionally uses the attached HTML's glass-panel aubergine/orange system:
+Requirements:
 
-- Hanken Grotesk for UI text
-- IBM Plex Mono for payment IDs, timestamps, keys, and trace data
-- Glass panels over the radial gray/orange/aubergine background
-- Compact CSS grid tables instead of MUI tables
-- Local primitives for badges, cards, filters, drawers, tabs, and action buttons
-
-## Running
+- Node.js `^22.22.0 || >=24.0.0` (CI uses the `22.22` line)
+- npm
+- A Paiziq backend and a read-capable API key for live data
 
 ```bash
-npm install
+npm ci
 npm run dev
+```
+
+Open the Vite URL, then connect with the backend URL and API key. The login form defaults to `http://127.0.0.1:8800`; the backend development key is commonly `dev-key`.
+
+The dashboard verifies backend connectivity and the API key with `GET /v1/agents?limit=1`. That endpoint currently accepts any authenticated key; each screen still enforces its own read/review/admin/ingest requirement. A live session stores its endpoint and API key in tab-scoped `sessionStorage`, survives reload in that tab, and is removed by sign-out or tab close. The session loader also deletes credentials left in `localStorage` by older builds. Selected organization/environment, time range, theme, saved payment views, and the non-secret reviewer convenience label remain browser-local preferences.
+
+Demo mode stores no endpoint or key. Primary live-data screens render explicit connection/no-data states; the remaining API helpers reject before making a network request. It is not a simulated backend and does not provide sample operational data.
+
+## Implemented routes
+
+| Route | Capability |
+| --- | --- |
+| `/login` | Live backend/API-key connection or data-free demo mode |
+| `/` | Live summary metrics, `payments.total` volume, decision/risk-flag charts, and recent payments |
+| `/payments` | Exact server-filtered/sorted pagination, saved views, and 30-second refresh |
+| `/payments/:id` | Payment transitions, decisions, correlated trace JSON, and exact payment webhook attempts |
+| `/reviews` | PZ-101 review queue, authenticated reviewer identity, assignment, actions, priority, and SLA state |
+| `/policies` | Reason-audited draft editing, allow/block lists, publish, rollback, versions, unsaved-draft diff, and simulation |
+| `/agents` | Agent inventory, metadata, filtering, and enable/disable |
+| `/audit` | Exact filters, pagination, details, and filtered CSV export |
+| `/alerts` | Notification and webhook-delivery feed |
+| `/settings` | API-key create, one-time reveal/copy, rotation, grace window, and revocation |
+
+All protected screen bundles are loaded with `React.lazy`. Shared loading, empty, not-found, error, rate-limit, authentication, and permission-denied states keep failed requests from being replaced with mock values.
+
+## Verification commands
+
+The repository configures the following checks:
+
+```bash
+npm run lint
+npm run typecheck
+npm run test
 npm run build
+npm run docs:check
+npm run check
+npm run test:e2e
+npm run test:e2e:service
 ```
 
 ## Azure Deployment
@@ -56,27 +89,16 @@ SWA_CLI_DEPLOYMENT_TOKEN="$(az staticwebapp secrets list \
 
 ## Routes
 
-- `/` - Overview
-- `/payments` - Live payment feed
-- `/payments/:id` - Payment detail / trace view
-- `/reviews` - Human review queue
-- `/policies` - Risk policy and thresholds
-- `/agents` - Agent and SDK monitoring
-- `/audit` - Immutable audit log
-- `/alerts` - Alerts
-- `/settings` - Organization and notifications
+## Design system
 
-## Project Shape
+The visual reference remains `/Users/chavz/Downloads/Payment Agent Audit Layer.html`.
 
-- `src/styles/theme.css` - editable semantic tokens
-- `src/styles/dashboard.css` - dashboard utility classes and interaction states
-- `src/app/lib` - formatting, nav, risk badge, and token helpers
-- `src/app/data` - mock domain data split by area
-- `src/app/components/layout` - shell, sidebar, top bar
-- `src/app/components/primitives` - reusable dashboard UI building blocks
-- `src/app/components/charts` - custom SVG charts
-- `src/app/components/screens` - route-level screens
+- Hanken Grotesk for UI copy and IBM Plex Mono for identifiers and wire data
+- Glass-panel aubergine/orange surfaces backed by semantic CSS variables
+- Light, dark, and system themes persisted under `paiziq.dashboard.theme`
+- CSS-grid operational tables with horizontal overflow on narrow screens
+- Desktop sidebar at 228px, overlay navigation below 1024px, and stacked layouts below 1024px/640px
 
-## Dependency Policy
+The route UI does not use MUI. Reuse primitives in `src/app/components/primitives`, live API functions in `src/app/api`, and semantic tokens in `src/styles/theme.css` before adding another dependency or local abstraction.
 
 The active dashboard no longer imports MUI page components. MUI, Emotion, and Recharts may still appear in `package.json` because the original Figma bundle included them and local shadcn files may still reference Recharts in unused utilities. Remove package dependencies only after confirming no current or planned screens import them.
