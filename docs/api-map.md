@@ -34,16 +34,21 @@ The login stores the normalized endpoint and API key in tab-scoped `sessionStora
 | Payment feed | `GET /v1/payments` | `env_id`; optional `agent_id`, `state`, `currency`, `min_amount`, `max_amount`, `q`; global `from_ms`/`to_ms`; `sort`; `limit`, `offset` |
 | Feed agent names | `GET /v1/agents` | `env_id`, `limit=200`, `offset=0` |
 | Payment detail | `GET /v1/payments/{payment_id}` | path `payment_id` |
+| Execution evidence | `GET /v1/payments/{payment_id}/execution` | path `payment_id`; read role and payment environment enforced by service |
 | Payment decisions | `GET /v1/decisions` | `payment_id`, `limit=200`, `offset=0` |
 | Direct trace lookup | `GET /v1/traces/{trace_id}` | tries payment `request_id`, then payment ID |
 | Trace correlation fallback | `GET /v1/search/events` | quoted `q`, `limit=10`, `offset=0`; returned trace IDs are fetched through `/v1/traces/{trace_id}` |
 | Related webhook deliveries | `GET /v1/webhook-deliveries` | exact `env_id` + `payment_id`, `limit=200`, increasing `offset` until `meta.total` is exhausted |
 | Delivery attempts | `GET /v1/webhook-deliveries/{delivery_id}` | every correlated delivery, loaded in concurrency batches of 20 |
-| Manual payment transition | `POST /v1/payments/{payment_id}/transition` | `{"to": "approved" | "needs_review" | "rejected" | "executed" | "failed", "reason": string}`; the dashboard requires a reason |
+| Manual payment transition | `POST /v1/payments/{payment_id}/transition` | `{"to": "approved" | "needs_review" | "rejected", "reason": string}`; the dashboard requires a reason |
 
 All payment-feed filters and sorting are server-side. `sort` is one of `created_desc`, `created_asc`, `amount_desc`, `amount_asc`, or `merchant_asc`; currency and amount ranges are exact, time bounds are inclusive epoch milliseconds, and `q` searches the payment ID, agent ID, principal ID, merchant, request ID, and intent text. `meta.total` is the total after those filters, so page boundaries are exact. If a filter makes the requested page invalid, the dashboard clamps to the last page and refetches that offset. Saved views are browser-local. The feed refetches every 30 seconds in live mode.
 
 The overview reads `payment_total` from the normalized summary payment-state counts and plots the summary's `risk_flags` map. It does not substitute verdict counts for risk flags.
+
+The execution-evidence endpoint returns the service authority, a nullable execution claim, its reservation, exact decimal strings for rolling 24-hour/30-day committed spend, and all unresolved reservations scoped by organization, environment, agent, and currency. Immutable request/policy snapshots and digests freeze at the execution claim; events preserve the recorded actor and timestamp. The API returns up to the latest 1,000 events in chronological order, with `events_total`, `events_limit`, and `events_truncated`; the UI labels an incomplete window. Budget limits show the current policy, while the immutable snapshot preserves the execution policy. `confirmed` means the executor recorded a successful provider result. This read API does not independently contact the provider.
+
+A 200 response with no claim is distinct from unavailable evidence. A legacy `executed` or `failed` payment without a claim is visibly unverified. A 404 does not prove no execution occurred; older servers may not support the endpoint. Unknown and in-progress results direct the operator to retain the original request and avoid a second charge. The dashboard has no execution, retry, reconciliation, or terminal-state mutation control. Refresh evidence repeats only the GET request. The evidence scope follows the payment, not the global time-range selector. The separate webhook section still reports delivery attempts; delivery success is not payment success.
 
 Direct transitions require ingest or admin access. A payment in `needs_review` is deliberately resolved through the Reviews API instead of a detail-page transition.
 

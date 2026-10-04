@@ -36,6 +36,7 @@ import {
   type TimelineEvent,
 } from "../../primitives";
 import { TraceJsonViewer } from "./TraceJsonViewer";
+import { ExecutionEvidencePanel } from "./ExecutionEvidencePanel";
 
 interface DetailData {
   payment: Payment;
@@ -187,6 +188,8 @@ export function PaymentDetailScreen() {
                 <div className="mono text-[12px] text-[var(--muted-foreground)]">{data.payment.agent_id}</div>
               </div>
             </GlassPanel>
+
+            <ExecutionEvidencePanel payment={data.payment} key={`${data.payment.id}-${revision}`} />
 
             <div className="responsive-stack grid grid-cols-[minmax(0,1.8fr)_minmax(300px,1fr)] items-start gap-[16px]">
               <div className="flex min-w-0 flex-col gap-[16px]">
@@ -389,7 +392,9 @@ export function PaymentDetailScreen() {
                     </>
                   ) : (
                     <div className="rounded-[9px] bg-[var(--muted)] p-[10px] text-[12px] text-[var(--muted-foreground)]">
-                      {["rejected", "executed", "failed"].includes(data.payment.state)
+                      {data.payment.state === "approved"
+                        ? "Approval permits an execution attempt. The execution service must record the provider result."
+                        : ["rejected", "executed", "failed"].includes(data.payment.state)
                         ? "This payment is in a terminal state."
                         : "No manual transition is available from this state."}
                     </div>
@@ -450,12 +455,6 @@ function transitionsFor(state: PaymentState): Array<{
     // Review resolution must go through /v1/reviews so the review record and
     // payment state remain synchronized.
     return [];
-  }
-  if (state === "approved") {
-    return [
-      { target: "executed", label: "Mark executed", variant: "approve" },
-      { target: "failed", label: "Mark failed", variant: "reject" },
-    ];
   }
   return [];
 }

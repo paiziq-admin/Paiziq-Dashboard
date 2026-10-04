@@ -13,6 +13,7 @@ import type {
   NotificationItem,
   Org,
   Payment,
+  PaymentExecutionEvidence,
   Policy,
   PolicyDocument,
   PolicyVersion,
@@ -80,6 +81,8 @@ export const fetchPayments = (
   },
 ) => apiFetch<Payment[]>(`/v1/payments${query(p)}`);
 export const fetchPayment = (id: string) => apiFetch<Payment>(`/v1/payments/${encodeURIComponent(id)}`);
+export const fetchPaymentExecution = (id: string) =>
+  apiFetch<PaymentExecutionEvidence>(`/v1/payments/${encodeURIComponent(id)}/execution`);
 export const fetchDecisions = (p: { payment_id?: string; limit?: number; offset?: number }) =>
   apiFetch<Decision[]>(`/v1/decisions${query(p)}`);
 export const transitionPayment = (

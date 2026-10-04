@@ -68,7 +68,7 @@ See `docs/api-map.md` for the exact paths, query strings, request bodies, and re
 | --- | --- |
 | Overview | Summary plus one `payments.total` timeseries; `risk_flags`; newest eight payments via `created_desc` |
 | Payment feed | Server-side environment/agent/state/currency/amount/text/time filters, sort, exact total, and pagination |
-| Payment detail | Primary payment first; decisions, trace correlation, and exact paginated `env_id` + `payment_id` webhook lookup settle independently |
+| Payment detail | Primary payment first; decisions, trace correlation, and exact paginated `env_id` + `payment_id` webhook lookup settle independently; execution evidence has its own loading/error/refresh state and preserves exact scoped ledger decimals |
 | Reviews | Open PZ-101 queue/detail and `GET /v1/reviews/identity`; role/tenant/identity-bound actions; 404-only older-server fallback |
 | Policies | Environment policy list, detail/version history, reason-audited draft saves, publish/rollback, local unsaved-draft diff, and inline unsaved-draft simulation |
 | Agents | Environment inventory and status patches through the backend's generic authenticated-key dependency |

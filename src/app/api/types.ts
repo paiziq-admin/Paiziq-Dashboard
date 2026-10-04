@@ -54,6 +54,60 @@ export interface Payment {
   transitions?: PaymentTransition[];
 }
 
+/** Exact decimal amounts are strings: do not convert these ledger values to Number. */
+export interface PaymentExecutionEvidence {
+  payment_id: string;
+  authority: "hosted";
+  execution: {
+    id: string;
+    logical_action_id: string;
+    status: "reserved" | "submitted" | "confirmed" | "failed" | "unknown";
+    request_digest: string;
+    policy_digest: string;
+    policy_version: number | null;
+    decision_id: string | null;
+    provider_idempotency_key: string;
+    amount: string;
+    currency: string;
+    created_at_ms: number;
+    updated_at_ms: number;
+    gateway_reference: string | null;
+    error: string | null;
+  } | null;
+  reservation: {
+    status: "held" | "committed" | "released";
+    amount: string;
+    currency: string;
+    expires_at_ms: number | null;
+  } | null;
+  budget: {
+    scope: { org_id: string; env_id: string; agent_id: string };
+    as_of_ms: number;
+    window: "rolling_24h";
+    monthly_window: "rolling_30d";
+    monthly_committed_amount: string;
+    monthly_reserved_amount: string;
+    currency: string;
+    committed_amount: string;
+    reserved_amount: string;
+    daily_budget: string | null;
+    monthly_budget: string | null;
+  };
+  request_snapshot: Record<string, unknown> | null;
+  policy_snapshot: Record<string, unknown> | null;
+  events: Array<{
+    id: string;
+    type: string;
+    at_ms: number;
+    actor: string;
+    payload: Record<string, unknown>;
+  }>;
+  legacy_state: string;
+  events_limit: number;
+  events_total: number;
+  events_truncated: boolean;
+}
+
 export interface Decision {
   id: string;
   payment_id: string;

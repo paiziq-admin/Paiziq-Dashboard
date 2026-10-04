@@ -26,7 +26,7 @@ The UI runtime is pinned to React `19.2.8` and React Router `8.3.0`. Runtime dep
 | `npm run typecheck` | Run strict TypeScript checking without emitting files |
 | `npm run test` | Run Vitest once in jsdom |
 | `npm run test:watch` | Run Vitest interactively |
-| `npm run test:e2e` | Run the six fixture Chromium workflows |
+| `npm run test:e2e` | Run the fixture Chromium workflows |
 | `npm run test:e2e:service` | Start isolated ingest + Vite and run the live SDK workflow |
 | `npm run docs:context` | Regenerate `docs/llm-context.md` |
 | `npm run docs:check` | Fail if the generated LLM context is stale |
@@ -51,13 +51,13 @@ Use the paired backend checkout at `../paiziq_backend/files/paiziq`, or set
 and 4173, then run `npm run test:e2e:service`. This command creates a temporary
 SQLite database and owns both servers; it never clears the manual demo database.
 
-The single service test seeds the SDK's approved/executed, needs-review, and
+The payment-agent service test seeds the SDK's approved/executed, needs-review, and
 rejected scenarios, signs in, selects the run's environment, verifies the exact
 trace correlation, and checks the review queue and published policy simulation.
 Set `PAIZIQ_DEMO_DIR=/absolute/output/path` to capture nine screenshots plus
 `workflow.json`. The backend `docs/e2e/PAYMENT_AGENT_WORKFLOW_TUTORIAL.md` contains
 the complete reproducible guide, with plan/audit evidence alongside it.
-This is local MockGateway coverage; the service lane is separate from fixture CI.
+A second service test runs `make phase0-demo` and follows real SDK hosted execution evidence into the dashboard. It checks one confirmed provider call across duplicate requests, held unknown funds, and a blocked budget. It uses only local mock providers. `PAIZIQ_DEMO_DIR` also captures `phase0-unknown-execution.png` and `phase0-workflow.json`. The service lane is separate from fixture CI.
 
 ## CI
 

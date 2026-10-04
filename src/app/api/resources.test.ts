@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { saveSession } from "./config";
-import { fetchEnvironments, fetchOrgs, fetchPayments } from "./resources";
+import { fetchEnvironments, fetchOrgs, fetchPaymentExecution, fetchPayments } from "./resources";
 
 beforeEach(() => {
   saveSession({
@@ -15,6 +15,16 @@ afterEach(() => {
 });
 
 describe("resource adapters", () => {
+  it("reads encoded execution evidence with authentication and keeps exact decimals", async () => {
+    const data = { payment_id: "pay / one", budget: { committed_amount: "9007199254740993.00000001" } };
+    const fetchMock = vi.fn().mockResolvedValue(Response.json({ success: true, data, error: null }));
+    vi.stubGlobal("fetch", fetchMock);
+    const result = await fetchPaymentExecution("pay / one");
+    expect(result.data).toEqual(data);
+    expect(requestUrls(fetchMock)).toEqual(["https://api.paiziq.test/v1/payments/pay%20%2F%20one/execution"]);
+    expect(fetchMock.mock.calls[0]?.[1]).toMatchObject({ method: "GET", headers: { Authorization: "Bearer test-key" } });
+  });
+
   it("loads every organization page instead of truncating workspace selection", async () => {
     const fetchMock = installPagedList("/v1/orgs", 201);
 

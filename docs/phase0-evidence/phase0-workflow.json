@@ -1,0 +1,48 @@
+{
+  "org": {
+    "id": "org_f96f2d9fba26fa4fa908",
+    "name": "phase0-demo-a4f53c29",
+    "created_at_ms": 1791146240381
+  },
+  "environment": {
+    "id": "env_a9f5561cb5dd89d27c1c",
+    "org_id": "org_f96f2d9fba26fa4fa908",
+    "name": "Phase 0 sandbox",
+    "kind": "sandbox",
+    "created_at_ms": 1791146240403
+  },
+  "agent": {
+    "id": "agt_6637198373990bf5e616",
+    "env_id": "env_a9f5561cb5dd89d27c1c",
+    "name": "phase0-execution-agent",
+    "framework": null,
+    "status": "active",
+    "metadata": {},
+    "created_at_ms": 1791146240456
+  },
+  "confirmed": {
+    "payment_id": "pay_c05cd8d3d842c352eec5",
+    "request_id": "pay_c4b451c793744ae8b2bbc12c05108bb8",
+    "executed": true,
+    "state": "executed",
+    "error": null
+  },
+  "unknown": {
+    "payment_id": "pay_76645b3db302fc7c2204",
+    "request_id": "pay_52e8c0d506af4612ad8015a0351adb7d",
+    "executed": false,
+    "state": "approved",
+    "error": "Mock provider received the request; its receipt is unavailable"
+  },
+  "blocked": {
+    "payment_id": "pay_9681b6bd055696dd9f07",
+    "request_id": "pay_3227718dd66d4037bc58b8bcc473454f",
+    "executed": false,
+    "state": "rejected",
+    "error": "Payment would exceed daily budget: 110.00 > 100.00 (spent 60.00)"
+  },
+  "provider_calls": {
+    "confirmed": 1,
+    "unknown": 1
+  }
+}
