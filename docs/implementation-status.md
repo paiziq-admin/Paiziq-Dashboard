@@ -106,3 +106,7 @@ Record future command results in the delivery/PR notes; do not convert “config
 ## Payment-agent workflow evidence — 2026-10-03
 
 The service lane was executed successfully against an isolated SQLite backend on Node 24.19.0: all three payment states, exact request/trace correlation, open review, published policy version 1, and a non-persisting policy simulation. Tutorial captures come from that run. The backend plan, endpoint report, and audit are in its `docs/e2e/` directory.
+
+## Azure deployment verification — 2026-10-04
+
+The latest dashboard CI passed lint, type checking, 24 unit tests and the production build, then failed documentation freshness before deployment. The generated snapshot is refreshed in this change; current checks are recorded in its PR. The hosted dashboard returned Azure HTTP 404 and the backend `/health` timed out. ARM reports subscription `Warned` and Container Apps reports `ManagedClusterSuspended`; the infrastructure bootstrap and lifecycle workflows have not run. These observations do not establish a working Azure deployment. The subscription Owner must restore access and run the [Paiziq-Infra bootstrap](https://github.com/paiziq-admin/Paiziq-Infra#one-time-setup-by-the-subscription-owner), followed by Spin up dev, before hosted health, authentication and CORS verification can pass.

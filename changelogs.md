@@ -2,6 +2,8 @@
 
 ## 2026-10-04
 
+- Regenerated the documentation snapshot after the Phase 0 merge to restore the dashboard CI freshness gate. Live Azure verification remains blocked: the subscription reports `Warned`, backend compute is suspended, and the dashboard hostname currently returns Azure HTTP 404.
+
 - Added the Phase 0 execution-evidence panel with read-only execution state, exact scoped spend/reservations, immutable request/policy snapshots and digests, and execution event history. JSON uses the existing secret redaction before display or copy.
 - Separated execution evidence from payment approval and legacy terminal reports. Unknown provider results retain a visible no-retry instruction. Removed manual “Mark executed” and “Mark failed” controls.
 - Added authenticated evidence reads, partial loading/error/404/403/429 states, explicit evidence refresh, stale-response isolation, API/component coverage, and responsive light/dark browser checks. Added the frontend Phase 0 tracker in implementation status. Large event payloads mount only when opened; truncated event windows show the total count.

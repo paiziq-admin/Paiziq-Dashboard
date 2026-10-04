@@ -24,11 +24,7 @@
 
 ## Implementation inventory
 
-<<<<<<< Updated upstream
-Source digest: `56af9efc24e529b3a86dfce13d402a01406a80122f35e049e2f739e1bd2242f6`
-=======
-Source digest: `dfbfb7aab86e0d8deb7e4458c317e9943d1236e9d87a9bc5cee931718634de1a`
->>>>>>> Stashed changes
+Source digest: `b1f67b9d7f4f510991eeaf2e08f92a8321dbeb3eba8c0b8f6542d430a4c1122b`
 
 - `.github/workflows/ci.yml`
 - `.github/workflows/notify-ci.yml`
@@ -611,6 +607,8 @@ Also verify:
 
 ## 2026-10-04
 
+- Regenerated the documentation snapshot after the Phase 0 merge to restore the dashboard CI freshness gate. Live Azure verification remains blocked: the subscription reports `Warned`, backend compute is suspended, and the dashboard hostname currently returns Azure HTTP 404.
+
 - Added the Phase 0 execution-evidence panel with read-only execution state, exact scoped spend/reservations, immutable request/policy snapshots and digests, and execution event history. JSON uses the existing secret redaction before display or copy.
 - Separated execution evidence from payment approval and legacy terminal reports. Unknown provider results retain a visible no-retry instruction. Removed manual “Mark executed” and “Mark failed” controls.
 - Added authenticated evidence reads, partial loading/error/404/403/429 states, explicit evidence refresh, stale-response isolation, API/component coverage, and responsive light/dark browser checks. Added the frontend Phase 0 tracker in implementation status. Large event payloads mount only when opened; truncated event windows show the total count.
@@ -912,3 +910,7 @@ Record future command results in the delivery/PR notes; do not convert “config
 ## Payment-agent workflow evidence — 2026-10-03
 
 The service lane was executed successfully against an isolated SQLite backend on Node 24.19.0: all three payment states, exact request/trace correlation, open review, published policy version 1, and a non-persisting policy simulation. Tutorial captures come from that run. The backend plan, endpoint report, and audit are in its `docs/e2e/` directory.
+
+## Azure deployment verification — 2026-10-04
+
+The latest dashboard CI passed lint, type checking, 24 unit tests and the production build, then failed documentation freshness before deployment. The generated snapshot is refreshed in this change; current checks are recorded in its PR. The hosted dashboard returned Azure HTTP 404 and the backend `/health` timed out. ARM reports subscription `Warned` and Container Apps reports `ManagedClusterSuspended`; the infrastructure bootstrap and lifecycle workflows have not run. These observations do not establish a working Azure deployment. The subscription Owner must restore access and run the [Paiziq-Infra bootstrap](https://github.com/paiziq-admin/Paiziq-Infra#one-time-setup-by-the-subscription-owner), followed by Spin up dev, before hosted health, authentication and CORS verification can pass.
