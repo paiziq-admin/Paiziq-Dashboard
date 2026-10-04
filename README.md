@@ -55,18 +55,39 @@ npm run test:e2e
 npm run test:e2e:service
 ```
 
-`npm run check` runs lint, typecheck, unit/component tests, the production build, and the generated-document freshness check. Playwright E2E is separate and is configured in CI after the quality job. These are available gates, not a claim that an arbitrary checkout or backend is currently passing.
+## Azure Deployment
 
-## Architecture and contracts
+The development dashboard is hosted at https://brave-river-0a6dd1310.5.azurestaticapps.net
+using Azure Static Web Apps (Free), in resource group `paiziq-dev`, Central US.
+It currently displays mock data. Deployment uploads the `dist` build without a
+server. `public/staticwebapp.config.json` enables direct links
+and refreshes on React routes and is copied into `dist` by Vite.
 
-- [Architecture](architecture.md) — providers, API layer, route loading, screen data flow, and UI system
-- [Developer guide](developer.md) — local workflow, tests, CI, API conventions, and visual QA
-- [Agent guide](agent.md) — repository invariants and change checklist
-- [Dashboard API map](docs/api-map.md) — exact live endpoints, query parameters, scopes, and fallbacks
-- [Implementation status](docs/implementation-status.md) — backlog coverage and truthful capability boundaries
-- [Changelog](changelogs.md) — dated implementation history
+### Manual GitHub deployment
 
-Run `npm run docs:context` after changing canonical documentation or the inventoried implementation. CI runs `npm run docs:check` against the generated `docs/llm-context.md`.
+Push your changes, then open the repository's **Actions** tab, select
+**Deploy dashboard to Azure**, click **Run workflow**, choose the branch containing
+your changes (normally `main`), and click **Run workflow** again. The selected
+branch is built and deployed to the existing live development dashboard.
+Pushes and pull requests do not trigger deployment.
+
+The workflow uses the repository secret `AZURE_STATIC_WEB_APPS_API_TOKEN`.
+Only one deployment runs at a time.
+
+### Local deployment
+
+After signing in with `az login`, you can also redeploy locally:
+
+```bash
+npm run build
+SWA_CLI_DEPLOYMENT_TOKEN="$(az staticwebapp secrets list \
+  --subscription 8406cce0-3a67-4d8e-b536-965b930989af \
+  --resource-group paiziq-dev --name paiziq-dashboard-dev \
+  --query properties.apiKey --output tsv)" \
+  npx -y @azure/static-web-apps-cli@2.0.10 deploy ./dist --env production --no-use-keychain
+```
+
+## Routes
 
 ## Design system
 
@@ -80,12 +101,4 @@ The visual reference remains `/Users/chavz/Downloads/Payment Agent Audit Layer.h
 
 The route UI does not use MUI. Reuse primitives in `src/app/components/primitives`, live API functions in `src/app/api`, and semantic tokens in `src/styles/theme.css` before adding another dependency or local abstraction.
 
-## Important limitations
-
-- The API key is stored in tab-scoped `sessionStorage`, not an HttpOnly cookie. Use the dashboard only on trusted devices and origins.
-- Database-managed reviewer identities are bound to the API-key name, environment, and role. Bootstrap admin keys have no managed reviewer identity, so their acting-reviewer label remains operator-entered metadata rather than a user account.
-- The login probe validates a key but does not prove that it has read access to every dashboard resource.
-- Numeric risk scores are not part of the v1 metrics contract; the overview shows exact counts for recorded `risk_flags`.
-- Agent responses do not include last-seen, SDK-error, latency, or health metrics.
-- Webhook deliveries are scoped by the selected environment; the legacy notification feed is global because its raw contract has no environment field.
-- Webhook-endpoint management, retention execution, organization/environment creation, and organization preference editing are backend capabilities not exposed by current dashboard screens.
+The active dashboard no longer imports MUI page components. MUI, Emotion, and Recharts may still appear in `package.json` because the original Figma bundle included them and local shadcn files may still reference Recharts in unused utilities. Remove package dependencies only after confirming no current or planned screens import them.
