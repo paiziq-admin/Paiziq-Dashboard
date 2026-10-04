@@ -24,7 +24,7 @@
 
 ## Implementation inventory
 
-Source digest: `b1f67b9d7f4f510991eeaf2e08f92a8321dbeb3eba8c0b8f6542d430a4c1122b`
+Source digest: `6103fd01eb8071e35a9db56ab897d6012dcbc0d4184bffa2e3474a5ea9bd8488`
 
 - `.github/workflows/ci.yml`
 - `.github/workflows/notify-ci.yml`
@@ -189,7 +189,9 @@ and refreshes on React routes and is copied into `dist` by Vite.
 
 Every push or PR merge to `main` runs **Dashboard CI and Azure deployment**.
 Lint, type checks, unit tests, build, documentation freshness and Chromium E2E
-must pass before the checked `dist` artifact is deployed. Pull requests run
+must pass before the checked `dist` artifact is deployed. After uploading, CI
+requires the hosted root and login route to respond successfully and verifies
+that the served JavaScript/CSS matches the checked build. Pull requests run
 checks only. The workflow can also be run manually on `main` from **Actions**.
 
 The workflow uses the repository secret `AZURE_STATIC_WEB_APPS_API_TOKEN`.
@@ -231,9 +233,6 @@ The visual reference remains `/Users/chavz/Downloads/Payment Agent Audit Layer.h
 
 The route UI does not use MUI. Reuse primitives in `src/app/components/primitives`, live API functions in `src/app/api`, and semantic tokens in `src/styles/theme.css` before adding another dependency or local abstraction.
 
-<<<<<<< Updated upstream
-The active dashboard no longer imports MUI page components. MUI, Emotion, and Recharts may still appear in `package.json` because the original Figma bundle included them and local shadcn files may still reference Recharts in unused utilities. Remove package dependencies only after confirming no current or planned screens import them.
-=======
 ## Important limitations
 
 - The API key is stored in tab-scoped `sessionStorage`, not an HttpOnly cookie. Use the dashboard only on trusted devices and origins.
@@ -244,7 +243,6 @@ The active dashboard no longer imports MUI page components. MUI, Emotion, and Re
 - Agent responses do not include last-seen, SDK-error, latency, or health metrics.
 - Webhook deliveries are scoped by the selected environment; the legacy notification feed is global because its raw contract has no environment field.
 - Webhook-endpoint management, retention execution, organization/environment creation, and organization preference editing are backend capabilities not exposed by current dashboard screens.
->>>>>>> Stashed changes
 
 ### agent.md
 
@@ -607,6 +605,8 @@ Also verify:
 
 ## 2026-10-04
 
+- Added a post-deployment gate for the hosted root/login routes and exact checked JavaScript/CSS assets. Azure accepting an upload no longer establishes CI deployment success when the served site is unavailable or stale. Removed leftover README conflict markers while retaining the current capability limitations.
+
 - Regenerated the documentation snapshot after the Phase 0 merge to restore the dashboard CI freshness gate. Live Azure verification remains blocked: the subscription reports `Warned`, backend compute is suspended, and the dashboard hostname currently returns Azure HTTP 404.
 
 - Added the Phase 0 execution-evidence panel with read-only execution state, exact scoped spend/reservations, immutable request/policy snapshots and digests, and execution event history. JSON uses the existing secret redaction before display or copy.
@@ -913,4 +913,4 @@ The service lane was executed successfully against an isolated SQLite backend on
 
 ## Azure deployment verification — 2026-10-04
 
-The latest dashboard CI passed lint, type checking, 24 unit tests and the production build, then failed documentation freshness before deployment. The generated snapshot is refreshed in this change; current checks are recorded in its PR. The hosted dashboard returned Azure HTTP 404 and the backend `/health` timed out. ARM reports subscription `Warned` and Container Apps reports `ManagedClusterSuspended`; the infrastructure bootstrap and lifecycle workflows have not run. These observations do not establish a working Azure deployment. The subscription Owner must restore access and run the [Paiziq-Infra bootstrap](https://github.com/paiziq-admin/Paiziq-Infra#one-time-setup-by-the-subscription-owner), followed by Spin up dev, before hosted health, authentication and CORS verification can pass.
+Initial main CI run `37235009448` passed lint, type checking, 24 unit tests and the production build, then failed documentation freshness before deployment. PR #5 refreshed the generated snapshot; main run `37239149845` subsequently passed its quality/browser gates and Azure accepted the upload, but the hosted root, index document and JavaScript still returned HTTP 404. Dashboard CI now requires hosted root/login availability and exact checked build assets after publishing. The hosted dashboard returned Azure HTTP 404 and the backend `/health` timed out. ARM reports subscription `Warned` and Container Apps reports `ManagedClusterSuspended`; the infrastructure bootstrap and lifecycle workflows have not run. These observations do not establish a working Azure deployment. The subscription Owner must restore access and run the [Paiziq-Infra bootstrap](https://github.com/paiziq-admin/Paiziq-Infra#one-time-setup-by-the-subscription-owner), followed by Spin up dev, before hosted health, authentication and CORS verification can pass.

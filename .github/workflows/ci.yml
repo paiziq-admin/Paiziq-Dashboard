@@ -59,6 +59,7 @@ jobs:
           name: dashboard-dist
           path: dist
       - name: Publish dashboard
+        id: publish
         uses: Azure/static-web-apps-deploy@4d27395796ac319302594769cfe812bd207490b1 # v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
@@ -68,3 +69,42 @@ jobs:
           skip_app_build: true
           skip_api_build: true
           production_branch: main
+      - name: Verify the hosted dashboard and deployed assets
+        env:
+          DASHBOARD_URL: ${{ steps.publish.outputs.static_web_app_url }}
+        run: |
+          set -euo pipefail
+          test -n "$DASHBOARD_URL"
+          site="${DASHBOARD_URL%/}"
+          curl --fail --silent --show-error --retry 12 --retry-all-errors --retry-delay 5 \
+            --retry-max-time 120 --connect-timeout 10 --max-time 15 "$site/" -o /tmp/hosted-index.html
+          curl --fail --silent --show-error --connect-timeout 10 --max-time 15 "$site/login" >/dev/null
+          python3 - "$site" <<'PYCODE'
+          import hashlib
+          from html.parser import HTMLParser
+          from pathlib import Path
+          import sys
+          import urllib.request
+
+          class Assets(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.paths = set()
+              def handle_starttag(self, tag, attrs):
+                  for name, value in attrs:
+                      if name in ("src", "href") and value and value.startswith("/assets/"):
+                          self.paths.add(value)
+
+          expected, hosted = Assets(), Assets()
+          expected.feed(Path("dist/index.html").read_text())
+          hosted.feed(Path("/tmp/hosted-index.html").read_text())
+          if not expected.paths or hosted.paths != expected.paths:
+              raise SystemExit("Hosted page does not reference the deployed build's assets")
+          for asset in sorted(expected.paths):
+              with urllib.request.urlopen(sys.argv[1] + asset, timeout=15) as response:
+                  payload = response.read()
+              local = Path("dist" + asset).read_bytes()
+              if hashlib.sha256(payload).digest() != hashlib.sha256(local).digest():
+                  raise SystemExit("Hosted asset does not match the checked build: " + asset)
+          print("Hosted login route and checked build assets verified")
+          PYCODE
