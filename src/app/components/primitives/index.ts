@@ -3,6 +3,7 @@ export * from "./Badges";
 export * from "./CodeBlock";
 export * from "./DrawerPanel";
 export * from "./EmptyState";
+export * from "./PaiziqLogo";
 export * from "./FilterBar";
 export * from "./GlassPanel";
 export * from "./GridTable";

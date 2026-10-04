@@ -1,8 +1,8 @@
 import { Link, useLocation } from "react-router";
-import { LogOut, ShieldCheck } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { activeNavKey, navItems } from "../../lib/nav";
 import { useSession, useWorkspace } from "../../context/DashboardContext";
-import { StatusDot } from "../primitives";
+import { PaiziqLogo, StatusDot } from "../primitives";
 
 interface SidebarProps {
   onNavigate?: () => void;
@@ -16,15 +16,9 @@ export function Sidebar({ onNavigate }: SidebarProps) {
 
   return (
     <nav className="flex h-full flex-col border-r glass-shell">
-      <div className="flex h-[56px] shrink-0 items-center border-b border-[rgba(86,66,86,0.10)] px-[20px]">
+      <div className="flex h-[56px] shrink-0 items-center border-b border-[rgba(86,66,86,0.10)] px-[20px] pl-[28px]">
         <div className="flex items-center gap-[10px]">
-          <div className="flex h-[34px] w-[34px] items-center justify-center rounded-[10px] bg-gradient-to-br from-[var(--accent)] to-[var(--accent-dark)] text-white shadow-[0_4px_12px_rgba(252,129,74,0.4)]">
-            <ShieldCheck size={18} strokeWidth={2.2} />
-          </div>
-          <div>
-            <div className="text-[14px] font-extrabold leading-[1.2] tracking-[-0.01em] text-[var(--foreground)]">Payment Agent</div>
-            <div className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted-foreground)]">Audit Layer</div>
-          </div>
+          <PaiziqLogo className="h-[30px] w-auto shrink-0 text-[var(--foreground)]" wordmark />
         </div>
       </div>
 
